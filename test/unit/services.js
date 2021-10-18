@@ -1,49 +1,64 @@
 const sinon = require('sinon');
 const { expect } = require('chai');
 const ProductsModel = require('../../models/ProductsModel');
-
-const ProductsService = {
-  create: () => null,
-};
+const ProductsService = require('../../services/ProductsService');
 
 describe('1 - Service - Insere um novo produto no BD', () => {
-  describe('quando o payload informado não é válido', () => {
-    const payloadProduct = {};
+  const payloadProduct = {
+    repeated: {
+      name: 'Example Product',
+      quantity: 2000,
+    },
+    new: {
+      name: 'New Product',
+      quantity: 2000,
+    },
+  };
+  
+  before(() => {
+    const ID_EXAMPLE = '604cb554311d68f491ba5781';
+    sinon.stub(ProductsModel, 'create')
+      .resolves({ id: ID_EXAMPLE });
+    sinon.stub(ProductsModel, 'getAll')
+      .resolves([payloadProduct.repeated]);
+  });
+  
+  after(() => {
+    ProductsModel.create.restore();
+    ProductsModel.getAll.restore();
+  });
 
-    it('retorna um boolean', async () => {
-      const response = await ProductsService.create(payloadProduct);
-      expect(response).to.be.a('boolean');
+  describe('quando o nome passado no payload já está cadastrado', () => {
+    it('retorna um objeto', async () => {
+      const response = await ProductsService.create(payloadProduct.repeated);
+      expect(response).to.be.a('object');
     });
 
-    it('o boolean contém "false"', async () => {
-      const response = await ProductsService.create(payloadProduct);
-      expect(response).to.be.equal(false);
+    it('o objeto error contém "code" e "message"', async () => {
+      const response = await ProductsService.create(payloadProduct.repeated);
+      expect(response.error).to.have.a.property('code');
+      expect(response.error).to.have.a.property('message');
+    });
+
+    it('"code" é "alreadyExists"', async () => {
+      const response = await ProductsService.create(payloadProduct.repeated);
+      expect(response.error.code).to.be.a('string', 'alreadyExists');
+    });
+
+    it('"message" é "Um produto já existe com esse nome"', async () => {
+      const response = await ProductsService.create(payloadProduct.repeated);
+      expect(response.error.message).to.be.a('string', 'Um produto já existe com esse nome');
     });
   });
 
   describe('quando é inserido com sucesso', () => {
-    const payloadProduct = {
-      name: 'Example Product',
-      quantity: 2000,
-    };
-
-    before(() => {
-      const ID_EXAMPLE = '604cb554311d68f491ba5781';
-      sinon.stub(ProductsModel, 'create')
-        .resolves({ id: ID_EXAMPLE });
-    });
-
-    after(() => {
-      ProductsModel.create.restore();
-    });
-
     it('retorna um objeto', async () => {
-      const response = await ProductsService.create(payloadProduct);
+      const response = await ProductsService.create(payloadProduct.new);
       expect(response).to.be.a('object');
     });
 
     it('tal objeto possui o "id" do novo produto inserido', async () => {
-      const response = await ProductsService.create(payloadProduct);
+      const response = await ProductsService.create(payloadProduct.new);
       expect(response).to.have.a.property('id');
     });
   });
