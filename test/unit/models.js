@@ -23,7 +23,8 @@ describe('1 - Model - Insere um novo produto no BD', () => {
   const payloadProduct = {
     name: 'Example Product',
     quantity: 2000,
-  }
+  };
+  
   describe('quando é inserido com sucesso', () => {
     before(mongoConnectionStub);
 
