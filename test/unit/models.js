@@ -3,10 +3,7 @@ const { MongoClient } = require('mongodb');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const sinon = require('sinon');
 const mongoConnection = require('../../models/connection');
-
-const ProductsModel = {
-  create: () => null,
-};
+const ProductsModel = require('../../models/ProductsModel');
 
 let connectionMock;
 const mongoConnectionStub = async () => {
@@ -41,11 +38,11 @@ describe('1 - Model - Insere um novo produto no BD', () => {
 
     it('tal objeto possui o "id" do novo produto inserido', async () => {
       const response = await ProductsModel.create(payloadProduct);
-      expect(response).to.have.a.property('id')
+      expect(response).to.have.a.property('id');
     });
 
     it('deve existir um produto com o nome cadastrado!', async () => {
-      await MoviesModel.create(payloadProduct);
+      await ProductsModel.create(payloadProduct);
       const productCreated = await connectionMock.collection(
         'products',
       ).findOne({ name: productCreated.name });
