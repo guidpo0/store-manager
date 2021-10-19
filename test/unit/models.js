@@ -19,7 +19,7 @@ const mongoConnectionStub = async () => {
   sinon.stub(mongoConnection, 'getConnection').resolves(connectionMock);
 };
 
-describe.skip('1 - Model - Insere um novo produto no BD', () => {
+describe('1 - Model - Insere um novo produto no BD', () => {
   const payloadProduct = {
     name: 'Example Product',
     quantity: 2000,
@@ -27,7 +27,7 @@ describe.skip('1 - Model - Insere um novo produto no BD', () => {
   
   describe('quando é inserido com sucesso', () => {
     before(mongoConnectionStub);
-
+  
     after(() => {
       mongoConnection.getConnection.restore();
     });

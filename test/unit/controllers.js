@@ -2,18 +2,21 @@ const sinon = require('sinon');
 const { expect } = require('chai');
 const ProductsService = require('../../services/ProductsService');
 const ProductsController = require('../../controllers/ProductsController');
+const ErrorController = require('../../controllers/ErrorController');
 
 describe('1 - Controller - Ao chamar o controller de create para produtos', () => {
   describe('quando o payload informado não é válido', () => {
     const response = {};
     const request = {};
+    let next;
 
     before(() => {
       request.body = {};
       response.status = sinon.stub()
-        .returns(response);
+      .returns(response);
       response.json = sinon.stub()
-        .returns();
+      .returns();
+      next = (error) => ErrorController(error, request, response);
       // sinon.stub(ProductsService, 'create')
       //   .resolves(false);
     });
@@ -23,12 +26,12 @@ describe('1 - Controller - Ao chamar o controller de create para produtos', () =
     // });
 
     it('é chamado o status com o código 400', async () => {
-      await ProductsController.create(request, response);
+      await ProductsController.create(request, response, next);
       expect(response.status.calledWith(400)).to.be.equal(true);
     });
 
     it('é chamado o json com a mensagem "Dados inválidos"', async () => {
-      await ProductsController.create(request, response);
+      await ProductsController.create(request, response, next);
       expect(response.json.calledWith({ message: 'Dados inválidos' })).to.be.equal(true);
     });
   });

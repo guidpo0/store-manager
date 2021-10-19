@@ -6,10 +6,7 @@ const create = async (req, res, next) => {
     name: Joi.string().min(6).required(),
     quantity: Joi.number().integer().min(1).required(),
   }).validate(req.body);
-  if (error) {
-    console.log(next);
-    return next(error);
-  }
+  if (error) next(error);
   const { name, quantity } = req.body;
   const newProduct = await ProductsService.create({ name, quantity });
   if (newProduct.error) return next(newProduct.error);
