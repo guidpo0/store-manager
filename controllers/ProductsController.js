@@ -27,8 +27,22 @@ const getById = async (req, res, next) => {
   return res.status(OK).json(product);
 };
 
+const update = async (req, res, next) => {
+  const { error } = Joi.object({
+    name: Joi.string().min(5).required(),
+    quantity: Joi.number().integer().min(1).required(),
+  }).validate(req.body);
+  if (error) return next(error);
+  const { name, quantity } = req.body;
+  const { id } = req.params;
+  const { _id, err: invalidId } = await ProductsService.update({ id, name, quantity });
+  if (invalidId) return next(invalidId);
+  return res.status(OK).json({ _id, name, quantity });
+};
+
 module.exports = {
   create,
   getAll,
   getById,
+  update,
 };

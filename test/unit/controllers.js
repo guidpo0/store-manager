@@ -11,6 +11,7 @@ const products = [{
   name: 'Example Product',
   quantity: 2000,
 }];
+const ID_EXAMPLE = '604cb554311d68f491ba5781';
 let next = {};
 
 describe('1 - Controller - Ao chamar o controller de create para produtos', () => {
@@ -258,6 +259,181 @@ describe('2 - Controller - Ao chamar o controller de busca de produtos', () => {
         await ProductsController.getById(request, response);
         expect(response.json.calledWith(products[0])).to.be.equal(true);
       });
+    });
+  });
+});
+
+describe('3 - Controller - Ao chamar o controller de update para produtos', () => {
+  describe('quando o payload informado não é válido pois', () => {
+    describe('o body é enviado sem o name,', () => {
+      before(() => {
+        request.body = { quantity: 2 };
+        request.params = { id: ID_EXAMPLE };
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns();
+        next = (error) => ErrorController(error, request, response);
+      });
+  
+      it('é chamado o status com o código 422', async () => {
+        await ProductsController.update(request, response, next);
+        expect(response.status.calledWith(422)).to.be.equal(true);
+      });
+  
+      it('é chamado o json com o código "invalid_data" e a mensagem "name is required"', async () => {
+        await ProductsController.update(request, response, next);
+        expect(response.json.calledWith({ err: {
+          code: 'invalid_data',
+          message: '\"name\" is required',
+        }})).to.be.equal(true);
+      });
+    });
+
+    describe('o body é enviado sem o quantity,', () => {
+      before(() => {
+        request.body = { name: 'New Example' };
+        request.params = { id: ID_EXAMPLE };
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns();
+        next = (error) => ErrorController(error, request, response);
+      });
+  
+      it('é chamado o status com o código 422', async () => {
+        await ProductsController.update(request, response, next);
+        expect(response.status.calledWith(422)).to.be.equal(true);
+      });
+  
+      it('é chamado o json com o código "invalid_data" e a mensagem "quantity is required"', async () => {
+        await ProductsController.update(request, response, next);
+        expect(response.json.calledWith({ err: {
+          code: 'invalid_data',
+          message: '\"quantity\" is required',
+        }})).to.be.equal(true);
+      });
+    });
+
+    describe('o name possui menos de 5 caracteres,', () => {
+      before(() => {
+        request.body = { name: 'Exa', quantity: 1 };
+        request.params = { id: ID_EXAMPLE };
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns();
+        next = (error) => ErrorController(error, request, response);
+      });
+  
+      it('é chamado o status com o código 422', async () => {
+        await ProductsController.update(request, response, next);
+        expect(response.status.calledWith(422)).to.be.equal(true);
+      });
+  
+      it('é chamado o json com o código "invalid_data" e a mensagem respectiva', async () => {
+        await ProductsController.update(request, response, next);
+        expect(response.json.calledWith({ err: {
+          code: 'invalid_data',
+          message: '\"name\" length must be at least 5 characters long',
+        }})).to.be.equal(true);
+      });
+    });
+
+    describe('quantity é menor que 1,', () => {
+      before(() => {
+        request.body = { name: 'Example', quantity: -1 };
+        request.params = { id: ID_EXAMPLE };
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns();
+        next = (error) => ErrorController(error, request, response);
+      });
+  
+      it('é chamado o status com o código 422', async () => {
+        await ProductsController.update(request, response, next);
+        expect(response.status.calledWith(422)).to.be.equal(true);
+      });
+  
+      it('é chamado o json com o código "invalid_data" e a mensagem respectiva', async () => {
+        await ProductsController.update(request, response, next);
+        expect(response.json.calledWith({ err: {
+          code: 'invalid_data',
+          message: '\"quantity\" must be larger than or equal to 1',
+        }})).to.be.equal(true);
+      });
+    });
+
+    describe('quantity é uma string,', () => {
+      before(() => {
+        request.body = { name: 'Example', quantity: 'b' };
+        request.params = { id: ID_EXAMPLE };
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns();
+        next = (error) => ErrorController(error, request, response);
+      });
+  
+      it('é chamado o status com o código 422', async () => {
+        await ProductsController.update(request, response, next);
+        expect(response.status.calledWith(422)).to.be.equal(true);
+      });
+  
+      it('é chamado o json com o código "invalid_data" e a mensagem respectiva', async () => {
+        await ProductsController.create(request, response, next);
+        expect(response.json.calledWith({ err: {
+          code: 'invalid_data',
+          message: '\"quantity\" must be a number',
+        }})).to.be.equal(true);
+      });
+    });
+
+    describe('o id não é válido', () => {
+      before(() => {
+        request.body = { name: 'Example', quantity: 100 };
+        request.params = { id: 'dffd4545' };
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns();
+        next = (error) => ErrorController(error, request, response);
+        sinon.stub(ProductsService, 'update').resolves({
+          err: {
+            code: 'invalid_data',
+            message: 'Wrong id format',
+          },
+        });
+      });
+  
+      after(() => {
+        ProductsService.update.restore();
+      });
+  
+      it('é chamado o status com o código 422', async () => {
+        await ProductsController.update(request, response, next);
+        expect(response.status.calledWith(422)).to.be.equal(true);
+      });
+  
+      it('é chamado o json com o código "invalid_data" e a mensagem respectiva', async () => {
+        await ProductsController.update(request, response, next);
+        expect(response.json.calledWith({ err: {
+          code: 'invalid_data',
+          message: 'Wrong id format',
+        }})).to.be.equal(true);
+      });
+    });
+  });
+
+  describe('quando é atualizado com sucesso', () => {
+    before(() => {
+      request.body = { name: 'Example Product', quantity: 2000 };
+      response.status = sinon.stub().returns(response);
+      response.json = sinon.stub().returns();
+      sinon.stub(ProductsService, 'update').resolves({ _id: ID_EXAMPLE, ...request.body });
+    });
+  
+    after(() => {
+      ProductsService.update.restore();
+    });
+
+    it('é chamado o status com o código 200', async () => {
+      await ProductsController.update(request, response);
+      expect(response.status.calledWith(200)).to.be.equal(true);
+    });
+
+    it('é chamado o json com as informações do produto', async () => {
+      await ProductsController.update(request, response);
+      expect(response.json.calledWith({ ...request.body, _id: ID_EXAMPLE })).to.be.equal(true);
     });
   });
 });
