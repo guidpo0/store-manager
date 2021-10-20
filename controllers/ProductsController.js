@@ -1,6 +1,6 @@
 const Joi = require('joi');
 const ProductsService = require('../services/ProductsService');
-const { CREATED } = require('../helpers/HTTPCodes');
+const { CREATED, OK } = require('../helpers/HTTPCodes');
 
 const create = async (req, res, next) => {
   const { error } = Joi.object({
@@ -9,11 +9,26 @@ const create = async (req, res, next) => {
   }).validate(req.body);
   if (error) return next(error);
   const { name, quantity } = req.body;
-  const { _id, error: alreadyExistsError } = await ProductsService.create({ name, quantity });
+  const { _id, err: alreadyExistsError } = await ProductsService.create({ name, quantity });
   if (alreadyExistsError) return next(alreadyExistsError);
   return res.status(CREATED).json({ _id, name, quantity });
 };
 
+const getAll = async (_req, res, _next) => {
+  const products = await ProductsService.getAll();
+  return res.status(OK).json({ products });
+};
+
+const getById = async (req, res, next) => {
+  const { id } = req.params;
+  const product = await ProductsService.getById(id);
+  const { err } = product;
+  if (err) return next(err);
+  return res.status(OK).json(product);
+};
+
 module.exports = {
   create,
+  getAll,
+  getById,
 };
