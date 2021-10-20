@@ -1,12 +1,13 @@
-module.exports = (err, _req, res, _next) => {
+const { UNPROCESSABLE_ENTITY } = require('../helpers/HTTPCodes');
+
+const ErrorController = (err, _req, res, _next) => {
   if (err.isJoi) {
-    return res.status(400).json({ error: { message: err.details[0].message } });
+    const { message } = err.details[0]; 
+    const error = { code: 'invalid_data', message };
+    return res.status(UNPROCESSABLE_ENTITY).json({ error });
   }
-  console.log(err);
-  const statusByErrorCode = {
-    notFound: 404,
-    alreadyExists: 409,
-  };
-  const status = statusByErrorCode[err.code] || 500;
-  res.status(status).json({ error: { message: err.message } });
+  // const status = statusByErrorCode[err.code] || 500;
+  // res.status(status).json({ error: { message: err.message } });
 };
+
+module.exports = ErrorController;
