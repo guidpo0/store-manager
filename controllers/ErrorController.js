@@ -1,4 +1,4 @@
-const { UNPROCESSABLE_ENTITY } = require('../helpers/HTTPCodes');
+const { UNPROCESSABLE_ENTITY, INTERNAL_SERVER_ERROR } = require('../helpers/HTTPCodes');
 
 const ErrorController = (err, _req, res, _next) => {
   if (err.isJoi) {
@@ -6,8 +6,11 @@ const ErrorController = (err, _req, res, _next) => {
     const error = { code: 'invalid_data', message };
     return res.status(UNPROCESSABLE_ENTITY).json({ error });
   }
-  // const status = statusByErrorCode[err.code] || 500;
-  // res.status(status).json({ error: { message: err.message } });
+  if (err.code === 'invalid_data') {
+    return res.status(UNPROCESSABLE_ENTITY).json({ error: err });
+  }
+  const serverError = { code: 'internal_error', message: 'Erro de servidor' };
+  res.status(INTERNAL_SERVER_ERROR).json({ error: serverError });
 };
 
 module.exports = ErrorController;

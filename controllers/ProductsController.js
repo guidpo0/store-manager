@@ -1,16 +1,17 @@
 const Joi = require('joi');
 const ProductsService = require('../services/ProductsService');
+const { CREATED } = require('../helpers/HTTPCodes');
 
 const create = async (req, res, next) => {
   const { error } = Joi.object({
-    name: Joi.string().min(6).required(),
+    name: Joi.string().min(5).required(),
     quantity: Joi.number().integer().min(1).required(),
   }).validate(req.body);
   if (error) next(error);
   const { name, quantity } = req.body;
-  const newProduct = await ProductsService.create({ name, quantity });
-  if (newProduct.error) return next(newProduct.error);
-  return res.status(201).json(newProduct.id);
+  const { id, error: alreadyExistsError } = await ProductsService.create({ name, quantity });
+  if (alreadyExistsError) next(alreadyExistsError);
+  return res.status(CREATED).json({ id, name, quantity });
 };
 
 module.exports = {

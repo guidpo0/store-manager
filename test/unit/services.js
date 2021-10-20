@@ -40,14 +40,14 @@ describe('1 - Service - Insere um novo produto no BD', () => {
       expect(response.error).to.have.a.property('message');
     });
 
-    it('"code" é "alreadyExists"', async () => {
+    it('"code" é "invalid_data"', async () => {
       const response = await ProductsService.create(payloadProduct.repeated);
-      expect(response.error.code).to.be.a('string', 'alreadyExists');
+      expect(response.error.code).to.be.a('string', 'invalid_data');
     });
 
-    it('"message" é "Um produto já existe com esse nome"', async () => {
+    it('"message" é "Product already exists"', async () => {
       const response = await ProductsService.create(payloadProduct.repeated);
-      expect(response.error.message).to.be.a('string', 'Um produto já existe com esse nome');
+      expect(response.error.message).to.be.a('string', 'Product already exists');
     });
   });
 
