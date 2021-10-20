@@ -13,7 +13,7 @@ const mongoConnectionStub = async () => {
   connectionMock = await MongoClient
     .connect(URLMock, {
       useNewUrlParser: true,
-      useUnifiedTopology: true
+      useUnifiedTopology: true,
     })
     .then((conn) => conn.db(DB_NAME));      
   sinon.stub(mongoConnection, 'getConnection').resolves(connectionMock);
@@ -34,6 +34,66 @@ describe('1 - Model - Insere um novo produto no BD', () => {
 
     it('retorna um objeto', async () => {
       const response = await ProductsModel.create(payloadProduct);
+      expect(response).to.be.a('object');
+    });
+
+    it('tal objeto possui o "_id" do novo produto inserido', async () => {
+      const response = await ProductsModel.create(payloadProduct);
+      expect(response).to.have.a.property('_id');
+    });
+
+    it('deve existir um produto com o nome cadastrado!', async () => {
+      await ProductsModel.create(payloadProduct);
+      const productsCollection = await connectionMock.collection('products');
+      const productCreated = await productsCollection.findOne({ name: productCreated.name });
+      expect(productCreated).to.be.not.null;
+    });
+  });
+});
+
+describe('2 - Model - Busca produtos no BD,', () => {
+  describe('trazendo todos cadastrados.', () => {
+    before(async () => {
+      const payloadProduct = {
+        name: 'Example Product',
+        quantity: 2000,
+      };
+      await mongoConnectionStub();
+      await ProductsModel.create(payloadProduct);
+    });
+  
+    after(() => {
+      mongoConnection.getConnection.restore();
+    });
+
+    it('retorna um array', async () => {
+      const response = await ProductsModel.getAll();
+      expect(response).to.be.a('array');
+    });
+
+    it('é um array de objetos com _id, name e quantity', async () => {
+      const response = await ProductsModel.getAll();
+      expect(response[0]).to.have.a.property('_id');
+      expect(response[0]).to.have.a.property('name');
+      expect(response[0]).to.have.a.property('quantity');
+    });
+
+    it('deve existir um produto com o nome cadastrado!', async () => {
+      const response = await ProductsModel.getAll();
+      const responseContaisProduct = response.some(({ name }) => name === 'Example Product');
+      expect(responseContaisProduct).to.be.equal(true);
+    });
+  });
+
+  describe.skip('quando é inserido com sucesso', () => {
+    before(mongoConnectionStub);
+  
+    after(() => {
+      mongoConnection.getConnection.restore();
+    });
+
+    it('retorna um objeto', async () => {
+      const response = await ProductsModel.create(payloadProduct);
       expect(response).to.be.a('object')
     });
 
@@ -44,9 +104,8 @@ describe('1 - Model - Insere um novo produto no BD', () => {
 
     it('deve existir um produto com o nome cadastrado!', async () => {
       await ProductsModel.create(payloadProduct);
-      const productCreated = await connectionMock.collection(
-        'products',
-      ).findOne({ name: productCreated.name });
+      const productsCollection = await connectionMock.collection('products');
+      const productCreated = await productsCollection.findOne({ name: productCreated.name });
       expect(productCreated).to.be.not.null;
     });
   });

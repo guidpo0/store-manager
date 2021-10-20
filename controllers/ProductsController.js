@@ -9,10 +9,9 @@ const create = async (req, res, next) => {
   }).validate(req.body);
   if (error) return next(error);
   const { name, quantity } = req.body;
-  const { id, error: alreadyExistsError } = await ProductsService.create({ name, quantity });
-  console.log(alreadyExistsError);
+  const { _id, error: alreadyExistsError } = await ProductsService.create({ name, quantity });
   if (alreadyExistsError) return next(alreadyExistsError);
-  return res.status(CREATED).json({ _id: id, name, quantity });
+  return res.status(CREATED).json({ _id, name, quantity });
 };
 
 module.exports = {

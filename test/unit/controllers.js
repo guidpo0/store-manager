@@ -158,7 +158,7 @@ describe('1 - Controller - Ao chamar o controller de create para produtos', () =
       request.body = { name: 'Example Product', quantity: 2000 };
       response.status = sinon.stub().returns(response);
       response.json = sinon.stub().returns();
-      sinon.stub(ProductsService, 'create').resolves({ id: '55454454' });
+      sinon.stub(ProductsService, 'create').resolves({ _id: '55454454' });
     });
   
     after(() => {
