@@ -24,7 +24,7 @@ describe('1 - Controller - Ao chamar o controller de create para produtos', () =
   
       it('é chamado o json com o código "invalid_data" e a mensagem "name is required"', async () => {
         await ProductsController.create(request, response, next);
-        expect(response.json.calledWith({ error: {
+        expect(response.json.calledWith({ err: {
           code: 'invalid_data',
           message: '\"name\" is required',
         }})).to.be.equal(true);
@@ -46,7 +46,7 @@ describe('1 - Controller - Ao chamar o controller de create para produtos', () =
   
       it('é chamado o json com o código "invalid_data" e a mensagem "quantity is required"', async () => {
         await ProductsController.create(request, response, next);
-        expect(response.json.calledWith({ error: {
+        expect(response.json.calledWith({ err: {
           code: 'invalid_data',
           message: '\"quantity\" is required',
         }})).to.be.equal(true);
@@ -68,7 +68,7 @@ describe('1 - Controller - Ao chamar o controller de create para produtos', () =
   
       it('é chamado o json com o código "invalid_data" e a mensagem respectiva', async () => {
         await ProductsController.create(request, response, next);
-        expect(response.json.calledWith({ error: {
+        expect(response.json.calledWith({ err: {
           code: 'invalid_data',
           message: '\"name\" length must be at least 5 characters long',
         }})).to.be.equal(true);
@@ -90,7 +90,7 @@ describe('1 - Controller - Ao chamar o controller de create para produtos', () =
   
       it('é chamado o json com o código "invalid_data" e a mensagem respectiva', async () => {
         await ProductsController.create(request, response, next);
-        expect(response.json.calledWith({ error: {
+        expect(response.json.calledWith({ err: {
           code: 'invalid_data',
           message: '\"quantity\" must be larger than or equal to 1',
         }})).to.be.equal(true);
@@ -112,7 +112,7 @@ describe('1 - Controller - Ao chamar o controller de create para produtos', () =
   
       it('é chamado o json com o código "invalid_data" e a mensagem respectiva', async () => {
         await ProductsController.create(request, response, next);
-        expect(response.json.calledWith({ error: {
+        expect(response.json.calledWith({ err: {
           code: 'invalid_data',
           message: '\"quantity\" must be a number',
         }})).to.be.equal(true);
@@ -144,7 +144,7 @@ describe('1 - Controller - Ao chamar o controller de create para produtos', () =
   
       it('é chamado o json com o código "invalid_data" e a mensagem respectiva', async () => {
         await ProductsController.create(request, response, next);
-        expect(response.json.calledWith({ error: {
+        expect(response.json.calledWith({ err: {
           code: 'invalid_data',
           message: 'Product already exists',
         }})).to.be.equal(true);
@@ -166,13 +166,13 @@ describe('1 - Controller - Ao chamar o controller de create para produtos', () =
     });
 
     it('é chamado o status com o código 201', async () => {
-      await ProductsController.create(request , response);
+      await ProductsController.create(request, response);
       expect(response.status.calledWith(201)).to.be.equal(true);
     });
 
     it('é chamado o json com as informações do produto', async () => {
       await ProductsController.create(request, response);
-      expect(response.json.calledWith({ ...request.body, id: '55454454' })).to.be.equal(true);
+      expect(response.json.calledWith({ ...request.body, _id: '55454454' })).to.be.equal(true);
     });
   });
 });
