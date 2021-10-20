@@ -4,10 +4,16 @@ const ProductsService = require('../../services/ProductsService');
 const ProductsController = require('../../controllers/ProductsController');
 const ErrorController = require('../../controllers/ErrorController');
 
+const response = {};
+const request = {};
+const products = [{
+  _id: '55454454',
+  name: 'Example Product',
+  quantity: 2000,
+}];
+let next = {};
+
 describe('1 - Controller - Ao chamar o controller de create para produtos', () => {
-  const response = {};
-  const request = {};
-  let next;
   describe('quando o payload informado não é válido pois', () => {
     describe('o body é enviado sem o name,', () => {
       before(() => {
@@ -173,6 +179,80 @@ describe('1 - Controller - Ao chamar o controller de create para produtos', () =
     it('é chamado o json com as informações do produto', async () => {
       await ProductsController.create(request, response);
       expect(response.json.calledWith({ ...request.body, _id: '55454454' })).to.be.equal(true);
+    });
+  });
+});
+
+describe('2 - Controller - Ao chamar o controller de busca de produtos', () => {
+  describe('pelo getAll', () => {
+    before(() => {
+      response.status = sinon.stub().returns(response);
+      response.json = sinon.stub().returns();
+      sinon.stub(ProductsService, 'getAll').resolves(products);
+    });
+
+    after(() => {
+      ProductsService.getAll.restore();
+    });
+
+    it('é chamado o status com o código 200', async () => {
+      await ProductsController.getAll(request, response);
+      expect(response.status.calledWith(200)).to.be.equal(true);
+    });
+
+    it('é chamado o json com os produtos', async () => {
+      await ProductsController.getAll(request, response);
+      expect(response.json.calledWith({ products })).to.be.equal(true);
+    });
+  });
+
+  describe('pelo getById', () => {
+    describe('quando o id não é válido', () => {
+      before(() => {
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns();
+        sinon.stub(ProductsService, 'getById').resolves(null);
+        next = (error) => ErrorController(error, request, response);
+      });
+
+      after(() => {
+        ProductsService.getById.restore();
+      });
+
+      it('é chamado o status com o código 422', async () => {
+        await ProductsController.getAll(request, response, next);
+        expect(response.status.calledWith(422)).to.be.equal(true);
+      });
+
+      it('é chamado o json com os produtos', async () => {
+        await ProductsController.getAll(request, response, next);
+        expect(response.json.calledWith({ err: {
+          code: 'invalid_data',
+          message: 'Wrong id format',
+        }})).to.be.equal(true);
+      });
+    });
+
+    describe('quando o id é válido', () => {
+      before(() => {
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns();
+        sinon.stub(ProductsService, 'getById').resolves(products[0]);
+      });
+
+      after(() => {
+        ProductsService.getById.restore();
+      });
+
+      it('é chamado o status com o código 200', async () => {
+        await ProductsController.getAll(request, response);
+        expect(response.status.calledWith(200)).to.be.equal(true);
+      });
+
+      it('é chamado o json com o produto', async () => {
+        await ProductsController.getAll(request, response);
+        expect(response.json.calledWith(products[0])).to.be.equal(true);
+      });
     });
   });
 });
