@@ -17,16 +17,16 @@ const create = async ({ name, quantity }) => {
 const getAll = async () => ProductsModel.getAll();
 
 const getById = async (_id) => {
-  const product = await ProductsModel.getById();
-  if (existingProduct) {
+  const product = await ProductsModel.getById(_id);
+  if (!product) {
     return {
       err: {
         code: 'invalid_data',
-        message: 'Product already exists',
+        message: 'Wrong id format',
       },
     };
   }
-  return ProductsModel.create({ name, quantity });
+  return product;
 };
 
 module.exports = {

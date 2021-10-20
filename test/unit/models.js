@@ -102,12 +102,12 @@ describe('2 - Model - Busca produtos no BD,', () => {
       mongoConnection.getConnection.restore();
     });
 
-    it('retorna um array.', async () => {
+    it('retorna um objeto.', async () => {
       const response = await ProductsModel.getById(id);
       expect(response).to.be.a('object');
     });
 
-    it('é um array de objetos com _id, name e quantity.', async () => {
+    it('é um objeto com _id, name e quantity.', async () => {
       const response = await ProductsModel.getById(id);
       expect(response).to.have.a.property('_id');
       expect(response).to.have.a.property('name');
@@ -118,6 +118,11 @@ describe('2 - Model - Busca produtos no BD,', () => {
       const response = await ProductsModel.getById(id);
       const responseContaisProduct = response.name === 'Example Product';
       expect(responseContaisProduct).to.be.equal(true);
+    });
+
+    it('se o id passado não estiver cadastrado retorna null', async () => {
+      const response = await ProductsModel.getById('example');
+      expect(response).to.be.equal(null);
     });
   });
 });

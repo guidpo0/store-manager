@@ -12,7 +12,6 @@ const newProduct = {
   quantity: 2000,
 };
 const ID_EXAMPLE = '604cb554311d68f491ba5781';
-const ID_WRONG = '60451984311d68f491b45865';
 
 describe('1 - Service - Insere um novo produto no BD', () => {
   before(() => {
@@ -54,9 +53,9 @@ describe('1 - Service - Insere um novo produto no BD', () => {
       expect(response).to.be.a('object');
     });
 
-    it('tal objeto possui o "id" do novo produto inserido', async () => {
+    it('tal objeto possui o "_id" do novo produto inserido', async () => {
       const response = await ProductsService.create(newProduct);
-      expect(response).to.have.a.property('id');
+      expect(response).to.have.a.property('_id');
     });
   });
 });
@@ -92,43 +91,51 @@ describe('2 - Service - Busca produtos no BD,', () => {
   });
 
   describe('trazendo um produto pelo ID', () => {
-    before(async () => {
-      sinon.stub(ProductsModel, 'getById').resolves({ ...payloadProduct, _id: ID_EXAMPLE });
-    });
-  
-    after(() => {
-      ProductsModel.getById.restore();
-    });
-
     describe('em caso de falha', () => {
+      before(async () => {
+        sinon.stub(ProductsModel, 'getById').resolves(null);
+      });
+    
+      after(() => {
+        ProductsModel.getById.restore();
+      });
+      
       it('retorna um objeto', async () => {
-        const response = await ProductsService.getById(ID_WRONG);
+        const response = await ProductsService.getById(ID_EXAMPLE);
         expect(response).to.be.a('object');
       });
-  
+      
       it('o objeto error contém "code" e "message"', async () => {
-        const response = await ProductsService.getById(ID_WRONG);
+        const response = await ProductsService.getById(ID_EXAMPLE);
         expect(response.err).to.have.a.property('code');
         expect(response.err).to.have.a.property('message');
       });
   
       it('"code" é "invalid_data"', async () => {
-        const response = await ProductsService.getById(ID_WRONG);
+        const response = await ProductsService.getById(ID_EXAMPLE);
         expect(response.err.code).to.be.a('string', 'invalid_data');
       });
   
       it('"message" é "Wrong id format"', async () => {
-        const response = await ProductsService.getById(ID_WRONG);
+        const response = await ProductsService.getById(ID_EXAMPLE);
         expect(response.err.message).to.be.a('string', 'Wrong id format');
       });
     });
 
     describe('em caso de sucesso', () => {
+      before(async () => {
+        sinon.stub(ProductsModel, 'getById').resolves({ ...payloadProduct, _id: ID_EXAMPLE });
+      });
+    
+      after(() => {
+        ProductsModel.getById.restore();
+      });
+
       it('retorna um objeto', async () => {
         const response = await ProductsService.getById(ID_EXAMPLE);
         expect(response).to.be.a('object');
       });
-  
+      
       it('o objeto possui _id, name e quantity.', async () => {
         const response = await ProductsService.getById(ID_EXAMPLE);
         expect(response).to.have.a.property('_id');
