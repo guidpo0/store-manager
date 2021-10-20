@@ -5,7 +5,22 @@ const create = async ({ name, quantity }) => {
   const existingProduct = products.some((product) => product.name === name);
   if (existingProduct) {
     return {
-      error: {
+      err: {
+        code: 'invalid_data',
+        message: 'Product already exists',
+      },
+    };
+  }
+  return ProductsModel.create({ name, quantity });
+};
+
+const getAll = async () => ProductsModel.getAll();
+
+const getById = async (_id) => {
+  const product = await ProductsModel.getById();
+  if (existingProduct) {
+    return {
+      err: {
         code: 'invalid_data',
         message: 'Product already exists',
       },
@@ -16,4 +31,6 @@ const create = async ({ name, quantity }) => {
 
 module.exports = {
   create,
+  getAll,
+  getById,
 };
