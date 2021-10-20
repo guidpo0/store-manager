@@ -166,7 +166,7 @@ describe('1 - Controller - Ao chamar o controller de create para produtos', () =
     });
 
     it('é chamado o status com o código 201', async () => {
-      await ProductsController.create(request, response);
+      await ProductsController.create(request , response);
       expect(response.status.calledWith(201)).to.be.equal(true);
     });
 
