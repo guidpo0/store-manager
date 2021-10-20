@@ -126,3 +126,42 @@ describe('2 - Model - Busca produtos no BD,', () => {
     });
   });
 });
+
+describe('3 - Model - Atualiza um produto no BD', () => {
+  const payloadProduct = {
+    name: 'Example Product',
+    quantity: 2000,
+  };
+  let id;
+  
+  describe('quando é atualizado com sucesso', () => {
+    before(async ()=> {
+      await mongoConnectionStub();
+      const productId = await ProductsModel.create({ name: 'Example', quantity: 1 });
+      id = productId._id;
+    });
+  
+    after(() => {
+      mongoConnection.getConnection.restore();
+    });
+
+    it('retorna um objeto', async () => {
+      const response = await ProductsModel.update({ _id: id, ...payloadProduct });
+      expect(response).to.be.a('object');
+    });
+
+    it('tal objeto possui o "_id", "name" e "quantity" do produto atualizado', async () => {
+      const response = await ProductsModel.update({ _id: id, ...payloadProduct });
+      expect(response).to.have.a.property('_id');
+      expect(response).to.have.a.property('name');
+      expect(response).to.have.a.property('quantity');
+    });
+
+    it('deve existir um produto com o nome atualizado', async () => {
+      await ProductsModel.update({ _id: id, ...payloadProduct });
+      const productsCollection = await connectionMock.collection('products');
+      const productUpdated = await productsCollection.findOne({ name: payloadProduct.name });
+      expect(productUpdated).to.be.not.null;
+    });
+  });
+});
