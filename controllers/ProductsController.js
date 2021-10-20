@@ -35,7 +35,7 @@ const update = async (req, res, next) => {
   if (error) return next(error);
   const { name, quantity } = req.body;
   const { id } = req.params;
-  const { _id, err: invalidId } = await ProductsService.update({ id, name, quantity });
+  const { _id, err: invalidId } = await ProductsService.update({ _id: id, name, quantity });
   if (invalidId) return next(invalidId);
   return res.status(OK).json({ _id, name, quantity });
 };
