@@ -16,9 +16,9 @@ const getAll = async () => (
   )
 );
 
-const getById = async (id) => (
+const getById = async (_id) => (
   mongoConnection.getConnection().then(
-    (db) => db.collection('products').findOne({ id }).toArray(),
+    (db) => db.collection('products').findOne({ _id }),
   )
 );
 

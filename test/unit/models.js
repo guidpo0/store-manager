@@ -45,7 +45,7 @@ describe('1 - Model - Insere um novo produto no BD', () => {
     it('deve existir um produto com o nome cadastrado!', async () => {
       await ProductsModel.create(payloadProduct);
       const productsCollection = await connectionMock.collection('products');
-      const productCreated = await productsCollection.findOne({ name: productCreated.name });
+      const productCreated = await productsCollection.findOne({ name: payloadProduct.name });
       expect(productCreated).to.be.not.null;
     });
   });
@@ -85,28 +85,39 @@ describe('2 - Model - Busca produtos no BD,', () => {
     });
   });
 
-  describe.skip('quando é inserido com sucesso', () => {
-    before(mongoConnectionStub);
+  describe('trazendo um produto pelo ID', () => {
+    let id;
+
+    before(async () => {
+      const payloadProduct = {
+        name: 'Example Product',
+        quantity: 2000,
+      };
+      await mongoConnectionStub();
+      const response = await ProductsModel.create(payloadProduct);
+      id = response._id;
+    });
   
     after(() => {
       mongoConnection.getConnection.restore();
     });
 
-    it('retorna um objeto', async () => {
-      const response = await ProductsModel.create(payloadProduct);
-      expect(response).to.be.a('object')
+    it('retorna um array.', async () => {
+      const response = await ProductsModel.getById(id);
+      expect(response).to.be.a('object');
     });
 
-    it('tal objeto possui o "id" do novo produto inserido', async () => {
-      const response = await ProductsModel.create(payloadProduct);
-      expect(response).to.have.a.property('id');
+    it('é um array de objetos com _id, name e quantity.', async () => {
+      const response = await ProductsModel.getById(id);
+      expect(response).to.have.a.property('_id');
+      expect(response).to.have.a.property('name');
+      expect(response).to.have.a.property('quantity');
     });
 
-    it('deve existir um produto com o nome cadastrado!', async () => {
-      await ProductsModel.create(payloadProduct);
-      const productsCollection = await connectionMock.collection('products');
-      const productCreated = await productsCollection.findOne({ name: productCreated.name });
-      expect(productCreated).to.be.not.null;
+    it('deve existir um produto com o id com o nome cadastrado.', async () => {
+      const response = await ProductsModel.getById(id);
+      const responseContaisProduct = response.name === 'Example Product';
+      expect(responseContaisProduct).to.be.equal(true);
     });
   });
 });
