@@ -2,6 +2,8 @@ const sinon = require('sinon');
 const { expect } = require('chai');
 const ProductsModel = require('../../models/ProductsModel');
 const ProductsService = require('../../services/ProductsService');
+const SalesModel = require('../../models/SalesModel');
+const SalesService = require('../../services/SalesService');
 
 const payloadProduct = {
   name: 'Example Product',
@@ -11,7 +13,13 @@ const newProduct = {
   name: 'New Product',
   quantity: 2000,
 };
-const ID_EXAMPLE = '604cb554311d68f491ba5781';
+const ID_EXAMPLE = '604ab554311d68f491ba5781';
+const payloadSales = [
+  {
+    productId: ID_EXAMPLE,
+    ...payloadProduct,
+  },
+];
 
 describe('1 - Service - Insere um novo produto no BD', () => {
   before(() => {
@@ -258,6 +266,68 @@ describe('4 - Service - Exclui um produto no BD', () => {
       expect(response).to.have.a.property('_id');
       expect(response).to.have.a.property('name');
       expect(response).to.have.a.property('quantity');
+    });
+  });
+});
+
+describe('5 - Service - Insere uma nova venda no BD', () => {
+  describe('quando algum productId passado não existe', () => {
+    before(() => {
+      sinon.stub(ProductsModel, 'getById').resolves(null);
+    });
+    
+    after(() => {
+      ProductsModel.getById.restore();
+    });
+
+    it('retorna um objeto', async () => {
+      const response = await SalesService.create(payloadProduct);
+      expect(response).to.be.a('object');
+    });
+
+    it('o objeto error contém "code" e "message"', async () => {
+      const response = await SalesService.create(payloadProduct);
+      expect(response.err).to.have.a.property('code');
+      expect(response.err).to.have.a.property('message');
+    });
+
+    it('"code" é "invalid_data"', async () => {
+      const response = await SalesService.create(payloadProduct);
+      expect(response.err.code).to.be.a('string', 'invalid_data');
+    });
+
+    it('"message" é "Wrong Product Id or invalid quantity"', async () => {
+      const response = await SalesService.create(payloadProduct);
+      expect(response.err.message).to.be.a('string', 'Wrong Product Id or invalid quantity');
+    });
+  });
+
+  describe('quando é inserido com sucesso', () => {
+    before(() => {
+      sinon.stub(SalesModel, 'create').resolves({ _id: ID_EXAMPLE, itensSold: payloadSales });
+      sinon.stub(ProductsModel, 'getById').resolves({ _id: ID_EXAMPLE, ...payloadProduct });
+    });
+    
+    after(() => {
+      SalesModel.create.restore();
+      ProductsModel.getById.restore();
+    });
+
+    it('retorna um objeto', async () => {
+      const response = await SalesService.create(payloadSales);
+      expect(response).to.be.a('object');
+    });
+
+    it('tal objeto possuem o "_id" e "itensSold"', async () => {
+      const response = await SalesService.create(payloadSales);
+      expect(response).to.have.a.property('_id');
+      expect(response).to.have.a.property('itensSold');
+    });
+
+    it('"itensSold" deve ser um array de objetos com as chaves "productId" e "quantity"', async () => {
+      const response = await SalesService.create(payloadSales);
+      expect(response.itensSold[0]).to.have.a.property('productId');
+      expect(response.itensSold[0]).to.have.a.property('quantity');
     });
   });
 });
