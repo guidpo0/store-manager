@@ -4,6 +4,7 @@ const { MongoMemoryServer } = require('mongodb-memory-server');
 const sinon = require('sinon');
 const mongoConnection = require('../../models/connection');
 const ProductsModel = require('../../models/ProductsModel');
+const SalesModel = require('../../models/SalesModel');
 
 let connectionMock;
 const mongoConnectionStub = async () => {
@@ -11,20 +12,31 @@ const mongoConnectionStub = async () => {
   const DBServer = new MongoMemoryServer();
   const URLMock = await DBServer.getUri();
   connectionMock = await MongoClient
-    .connect(URLMock, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    })
-    .then((conn) => conn.db(DB_NAME));      
+  .connect(URLMock, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then((conn) => conn.db(DB_NAME));      
   sinon.stub(mongoConnection, 'getConnection').resolves(connectionMock);
 };
 
+let id;
+const payloadProduct = {
+  name: 'Example Product',
+  quantity: 2000,
+};
+const payloadSales = [
+  {
+    producId: '604cb554311d68f491ba5781',
+    ...payloadProduct,
+  },
+  {
+    producId: '604df554311d68f491ba5781',
+    ...payloadProduct,
+  },
+];
+
 describe('1 - Model - Insere um novo produto no BD', () => {
-  const payloadProduct = {
-    name: 'Example Product',
-    quantity: 2000,
-  };
-  
   describe('quando é inserido com sucesso', () => {
     before(mongoConnectionStub);
   
@@ -54,10 +66,6 @@ describe('1 - Model - Insere um novo produto no BD', () => {
 describe('2 - Model - Busca produtos no BD,', () => {
   describe('trazendo todos cadastrados.', () => {
     before(async () => {
-      const payloadProduct = {
-        name: 'Example Product',
-        quantity: 2000,
-      };
       await mongoConnectionStub();
       await ProductsModel.create(payloadProduct);
     });
@@ -86,13 +94,7 @@ describe('2 - Model - Busca produtos no BD,', () => {
   });
 
   describe('trazendo um produto pelo ID', () => {
-    let id;
-
     before(async () => {
-      const payloadProduct = {
-        name: 'Example Product',
-        quantity: 2000,
-      };
       await mongoConnectionStub();
       const response = await ProductsModel.create(payloadProduct);
       id = response._id;
@@ -128,12 +130,6 @@ describe('2 - Model - Busca produtos no BD,', () => {
 });
 
 describe('3 - Model - Atualiza um produto no BD', () => {
-  const payloadProduct = {
-    name: 'Example Product',
-    quantity: 2000,
-  };
-  let id;
-  
   describe('quando é atualizado com sucesso', () => {
     before(async ()=> {
       await mongoConnectionStub();
@@ -167,12 +163,6 @@ describe('3 - Model - Atualiza um produto no BD', () => {
 });
 
 describe('4 - Model - Exclui um produto no BD', () => {
-  const payloadProduct = {
-    name: 'Example Product',
-    quantity: 2000,
-  };
-  let id;
-  
   describe('quando é excluído com sucesso', () => {
     beforeEach(async ()=> {
       const productId = await ProductsModel.create(payloadProduct);
@@ -202,6 +192,42 @@ describe('4 - Model - Exclui um produto no BD', () => {
       const productsCollection = await connectionMock.collection('products');
       const product = await productsCollection.findOne(ObjectId(id));
       expect(product).to.be.null;
+    });
+  });
+});
+
+describe('5 - Model - Insere uma nova venda no BD', () => {
+  describe('quando é inserida com sucesso', () => {
+    before(mongoConnectionStub);
+  
+    after(() => {
+      mongoConnection.getConnection.restore();
+    });
+
+    it('retorna um objeto', async () => {
+      const response = await SalesModel.create(payloadSales);
+      expect(response).to.be.a('objeto');
+    });
+
+    it('tal objeto possuem o "_id" e "itensSold"', async () => {
+      const response = await SalesModel.create(payloadSales);
+      expect(response).to.have.a.property('_id');
+      expect(response).to.have.a.property('itensSold');
+    });
+
+    it('"itensSold" deve ser um array de objetos com as chaves "productId" e "quantity"', async () => {
+      const response = await SalesModel.create(payloadSales);
+      expect(response.itensSold[0]).to.have.a.property('productId');
+      expect(response.itensSold[0]).to.have.a.property('quantity');
+    });
+
+    it('deve existir uma venda com o ID do produto cadastrado!', async () => {
+      await SalesModel.create(payloadSales);
+      const salesCollection = await connectionMock.collection('sales');
+      const saleCreated = await salesCollection.findOne(
+        { 'itensSold.0.productId': payloadSale[0].productId },
+      );
+      expect(saleCreated).to.be.not.null;
     });
   });
 });
