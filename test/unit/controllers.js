@@ -825,3 +825,58 @@ describe('7 - Controller - Ao chamar o controller de update para vendas', () => 
     });
   });
 });
+
+describe('8 - Controller - Ao chamar o controller para apagar uma venda', () => {
+  describe('quando o id não é válido', () => {
+    before(() => {
+      request.params = { id: sales._id };
+      response.status = sinon.stub().returns(response);
+      response.json = sinon.stub().returns();
+      sinon.stub(SalesService, 'remove').resolves({ err: {
+        code: 'invalid_data',
+        message: 'Wrong sale ID format',
+      }});
+      next = (error) => SalesErrorController(error, request, response);
+    });
+
+    after(() => {
+      SalesService.remove.restore();
+    });
+
+    it('é chamado o status com o código 422', async () => {
+      await SalesController.remove(request, response, next);
+      expect(response.status.calledWith(422)).to.be.equal(true);
+    });
+
+    it('é chamado o json com os produtos', async () => {
+      await SalesController.remove(request, response, next);
+      expect(response.json.calledWith({ err: {
+        code: 'invalid_data',
+        message: 'Wrong sale ID format',
+      }})).to.be.equal(true);
+    });
+  });
+
+  describe('quando o id é válido', () => {
+    before(() => {
+      request.params = { id: sales._id };
+      response.status = sinon.stub().returns(response);
+      response.json = sinon.stub().returns();
+      sinon.stub(SalesService, 'remove').resolves(sales);
+    });
+
+    after(() => {
+      SalesService.remove.restore();
+    });
+
+    it('é chamado o status com o código 200', async () => {
+      await SalesController.remove(request, response);
+      expect(response.status.calledWith(200)).to.be.equal(true);
+    });
+
+    it('é chamado o json com o produto', async () => {
+      await SalesController.remove(request, response);
+      expect(response.json.calledWith(sales)).to.be.equal(true);
+    });
+  });
+});
