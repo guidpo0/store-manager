@@ -328,3 +328,36 @@ describe('7 - Model - Atualiza uma venda no BD', () => {
     });
   });
 });
+
+describe('8 - Model - Exclui uma venda no BD', () => {
+  describe('quando é excluída com sucesso', () => {
+    beforeEach(async ()=> {
+      const saleId = await SalesModel.create(payloadSales);
+      id = saleId._id;
+    });
+
+    before(mongoConnectionStub);
+  
+    after(() => {
+      mongoConnection.getConnection.restore();
+    });
+
+    it('retorna um objeto', async () => {
+      const response = await SalesModel.remove(id);
+      expect(response).to.be.a('object');
+    });
+
+    it('tal objeto possui o "_id" e "itensSold" do produto excluído', async () => {
+      const response = await SalesModel.remove(id);
+      expect(response).to.have.a.property('_id');
+      expect(response).to.have.a.property('itensSold');
+    });
+
+    it('não deve existir uma venda com o id excluído', async () => {
+      await SalesModel.remove(id);
+      const salesCollection = await connectionMock.collection('sales');
+      const sale = await salesCollection.findOne(ObjectId(id));
+      expect(sale).to.be.null;
+    });
+  });
+});
