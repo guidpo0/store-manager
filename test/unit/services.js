@@ -414,3 +414,57 @@ describe('6 - Service - Busca vendas no BD,', () => {
     });
   });
 });
+
+describe('7 - Service - Atualiza uma venda no BD', () => {
+  describe('em caso de falha', () => {
+    before(async () => {
+      sinon.stub(SalesModel, 'update').resolves(null);
+    });
+  
+    after(() => {
+      SalesModel.update.restore();
+    });
+    
+    it('retorna um objeto', async () => {
+      const response = await SalesService.update({ _id: ID_EXAMPLE, itensSold: payloadSales });
+      expect(response).to.be.a('object');
+    });
+    
+    it('o objeto error contém "code" e "message"', async () => {
+      const response = await SalesService.update({ _id: ID_EXAMPLE, itensSold: payloadSales });
+      expect(response.err).to.have.a.property('code');
+      expect(response.err).to.have.a.property('message');
+    });
+
+    it('"code" é "invalid_data"', async () => {
+      const response = await SalesService.update({ _id: ID_EXAMPLE, itensSold: payloadSales });
+      expect(response.err.code).to.be.a('string', 'invalid_data');
+    });
+
+    it('"message" é "Wrong product ID or invalid quantity"', async () => {
+      const response = await SalesService.update({ _id: ID_EXAMPLE, itensSold: payloadSales });
+      expect(response.err.message).to.be.a('string', 'Wrong product ID or invalid quantity');
+    });
+  });
+
+  describe('em caso de sucesso', () => {
+    before(async () => {
+      sinon.stub(SalesModel, 'update').resolves({ _id: ID_EXAMPLE, itensSold: payloadSales });
+    });
+  
+    after(() => {
+      SalesModel.update.restore();
+    });
+
+    it('retorna um objeto', async () => {
+      const response = await SalesService.update({ _id: ID_EXAMPLE, itensSold: payloadSales });
+      expect(response).to.be.a('object');
+    });
+    
+    it('o objeto possui _id e itensSold', async () => {
+      const response = await SalesService.update({ _id: ID_EXAMPLE, ...payloadProduct });
+      expect(response).to.have.a.property('_id');
+      expect(response).to.have.a.property('itensSold');
+    });
+  });
+});
