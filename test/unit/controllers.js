@@ -706,3 +706,122 @@ describe('6 - Controller - Ao chamar o controller de busca de vendas', () => {
     });
   });
 });
+
+describe('7 - Controller - Ao chamar o controller de update para vendas', () => {
+  describe('quando o payload informado não é válido pois', () => {
+    describe('o body é enviado sem o productId,', () => {
+      before(() => {
+        request.body = [{ quantity: 2 }];
+        request.params = { id: ID_EXAMPLE };
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns();
+        next = (error) => SalesErrorController(error, request, response);
+      });
+  
+      it('é chamado o status com o código 404', async () => {
+        await SalesController.update(request, response, next);
+        expect(response.status.calledWith(404)).to.be.equal(true);
+      });
+  
+      it('é chamado o json com o código "invalid_data" e a mensagem referente', async () => {
+        await SalesController.update(request, response, next);
+        expect(response.json.calledWith({ err: {
+          code: 'invalid_data',
+          message: 'Wrong product ID or invalid quantity',
+        }})).to.be.equal(true);
+      });
+    });
+
+    describe('o body é enviado sem o quantity,', () => {
+      before(() => {
+        request.body = [{ productId: 'New Example' }];
+        request.params = { id: ID_EXAMPLE };
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns();
+        next = (error) => SalesErrorController(error, request, response);
+      });
+  
+      it('é chamado o status com o código 404', async () => {
+        await SalesController.update(request, response, next);
+        expect(response.status.calledWith(404)).to.be.equal(true);
+      });
+  
+      it('é chamado o json com o código "invalid_data" e a mensagem referente', async () => {
+        await SalesController.update(request, response, next);
+        expect(response.json.calledWith({ err: {
+          code: 'invalid_data',
+          message: 'Wrong product ID or invalid quantity',
+        }})).to.be.equal(true);
+      });
+    });
+
+    describe('quantity é menor que 1,', () => {
+      before(() => {
+        request.body = [{ productId: 'Example', quantity: -1 }];
+        request.params = { id: ID_EXAMPLE };
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns();
+        next = (error) => SalesErrorController(error, request, response);
+      });
+  
+      it('é chamado o status com o código 404', async () => {
+        await SalesController.update(request, response, next);
+        expect(response.status.calledWith(404)).to.be.equal(true);
+      });
+  
+      it('é chamado o json com o código "invalid_data" e a mensagem respectiva', async () => {
+        await SalesController.update(request, response, next);
+        expect(response.json.calledWith({ err: {
+          code: 'invalid_data',
+          message: 'Wrong product ID or invalid quantity',
+        }})).to.be.equal(true);
+      });
+    });
+
+    describe('quantity é uma string,', () => {
+      before(() => {
+        request.body = [{ productId: 'Example', quantity: 'b' }];
+        request.params = { id: ID_EXAMPLE };
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns();
+        next = (error) => SalesErrorController(error, request, response);
+      });
+  
+      it('é chamado o status com o código 404', async () => {
+        await SalesController.update(request, response, next);
+        expect(response.status.calledWith(404)).to.be.equal(true);
+      });
+  
+      it('é chamado o json com o código "invalid_data" e a mensagem respectiva', async () => {
+        await SalesController.create(request, response, next);
+        expect(response.json.calledWith({ err: {
+          code: 'invalid_data',
+          message: 'Wrong product ID or invalid quantity',
+        }})).to.be.equal(true);
+      });
+    });
+  });
+
+  describe('quando é atualizado com sucesso', () => {
+    before(() => {
+      request.body = [{ productId: ID_EXAMPLE, quantity: 2000 }];
+      response.status = sinon.stub().returns(response);
+      response.json = sinon.stub().returns();
+      sinon.stub(SalesService, 'update').resolves({ _id: ID_EXAMPLE, itensSold: request.body });
+    });
+  
+    after(() => {
+      SalesService.update.restore();
+    });
+
+    it('é chamado o status com o código 200', async () => {
+      await SalesController.update(request, response);
+      expect(response.status.calledWith(200)).to.be.equal(true);
+    });
+
+    it('é chamado o json com as informações do produto', async () => {
+      await SalesController.update(request, response);
+      expect(response.json.calledWith({ itensSold: request.body, _id: ID_EXAMPLE })).to.be.equal(true);
+    });
+  });
+});
