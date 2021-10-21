@@ -13,7 +13,7 @@ const create = async (req, res, next) => {
   const { body } = req;
   const { _id, itensSold, err: productDoesntExistsError } = await SalesService.create(body);
   if (productDoesntExistsError) return next(productDoesntExistsError);
-  return res.status(CREATED).json({ _id, itensSold });
+  return res.status(OK).json({ _id, itensSold });
 };
 
 // const getAll = async (_req, res, _next) => {

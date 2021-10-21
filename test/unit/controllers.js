@@ -616,9 +616,9 @@ describe('5 - Controller - Ao chamar o controller de create para sales', () => {
       SalesService.create.restore();
     });
 
-    it('é chamado o status com o código 201', async () => {
+    it('é chamado o status com o código 200', async () => {
       await SalesController.create(request, response);
-      expect(response.status.calledWith(201)).to.be.equal(true);
+      expect(response.status.calledWith(200)).to.be.equal(true);
     });
 
     it('é chamado o json com as informações do produto', async () => {

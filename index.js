@@ -1,5 +1,6 @@
 const express = require('express');
 const productsRouter = require('./routes/productsRouter');
+const salesRouter = require('./routes/salesRouter');
 
 const PORT = 3000;
 const app = express();
@@ -11,5 +12,7 @@ app.get('/', (_request, response) => {
 });
 
 app.use('/products', productsRouter);
+
+app.use('/sales', salesRouter);
 
 app.listen(PORT, () => { console.log(`Ouvindo a porta ${PORT}`); });
