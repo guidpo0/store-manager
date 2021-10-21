@@ -627,3 +627,82 @@ describe('5 - Controller - Ao chamar o controller de create para sales', () => {
     });
   });
 });
+
+describe('6 - Controller - Ao chamar o controller de busca de vendas', () => {
+  describe('pelo getAll', () => {
+    before(() => {
+      response.status = sinon.stub().returns(response);
+      response.json = sinon.stub().returns();
+      sinon.stub(SalesService, 'getAll').resolves(sales);
+    });
+
+    after(() => {
+      SalesService.getAll.restore();
+    });
+
+    it('é chamado o status com o código 200', async () => {
+      await SalesController.getAll(request, response);
+      expect(response.status.calledWith(200)).to.be.equal(true);
+    });
+
+    it('é chamado o json com os produtos', async () => {
+      await SalesController.getAll(request, response);
+      expect(response.json.calledWith({ sales })).to.be.equal(true);
+    });
+  });
+
+  describe('pelo getById', () => {
+    describe('quando o id não é válido', () => {
+      before(() => {
+        request.params = { id: products[0]._id };
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns();
+        sinon.stub(SalesService, 'getById').resolves({ err: {
+          code: 'not_found',
+          message: 'Sale not found',
+        }});
+        next = (error) => SalesErrorController(error, request, response);
+      });
+
+      after(() => {
+        SalesService.getById.restore();
+      });
+
+      it('é chamado o status com o código 404', async () => {
+        await SalesController.getById(request, response, next);
+        expect(response.status.calledWith(404)).to.be.equal(true);
+      });
+
+      it('é chamado o json com os produtos', async () => {
+        await SalesController.getById(request, response, next);
+        expect(response.json.calledWith({ err: {
+          code: 'not_found',
+          message: 'Sale not found',
+        }})).to.be.equal(true);
+      });
+    });
+
+    describe('quando o id é válido', () => {
+      before(() => {
+        request.params = { id: products[0]._id };
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns();
+        sinon.stub(SalesService, 'getById').resolves(sales[0]);
+      });
+
+      after(() => {
+        SalesService.getById.restore();
+      });
+
+      it('é chamado o status com o código 200', async () => {
+        await SalesController.getById(request, response);
+        expect(response.status.calledWith(200)).to.be.equal(true);
+      });
+
+      it('é chamado o json com o produto', async () => {
+        await SalesController.getById(request, response);
+        expect(response.json.calledWith(sales[0])).to.be.equal(true);
+      });
+    });
+  });
+});
