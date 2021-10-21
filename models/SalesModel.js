@@ -1,4 +1,4 @@
-// const { ObjectId } = require('mongodb');
+const { ObjectId } = require('mongodb');
 const mongoConnection = require('./connection');
 
 const create = async (products) => {
@@ -12,20 +12,20 @@ const create = async (products) => {
   };
 };
 
-// const getAll = async () => (
-//   mongoConnection.getConnection().then(
-//     (db) => db.collection('products').find().toArray(),
-//   )
-// );
+const getAll = async () => (
+  mongoConnection.getConnection().then(
+    (db) => db.collection('sales').find().toArray(),
+  )
+);
 
-// const getById = async (_id) => {
-//   if (ObjectId.isValid(_id)) {
-//     return mongoConnection.getConnection().then(
-//       (db) => db.collection('products').findOne(ObjectId(_id)),
-//     );
-//   }
-//   return null;
-// };
+const getById = async (_id) => {
+  if (ObjectId.isValid(_id)) {
+    return mongoConnection.getConnection().then(
+      (db) => db.collection('sales').findOne(ObjectId(_id)),
+    );
+  }
+  return null;
+};
 
 // const update = async ({ _id, name, quantity }) => {
 //   if (ObjectId.isValid(_id)) {
@@ -53,8 +53,8 @@ const create = async (products) => {
 
 module.exports = {
   create,
-  // getAll,
-  // getById,
+  getAll,
+  getById,
   // update,
   // remove,
 };
