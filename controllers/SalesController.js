@@ -1,6 +1,6 @@
 const Joi = require('joi');
 const SalesService = require('../services/SalesService');
-const { CREATED, OK } = require('../helpers/HTTPCodes');
+const { OK } = require('../helpers/HTTPCodes');
 
 const create = async (req, res, next) => {
   const { error } = Joi.array().items(
@@ -16,18 +16,18 @@ const create = async (req, res, next) => {
   return res.status(OK).json({ _id, itensSold });
 };
 
-// const getAll = async (_req, res, _next) => {
-//   const products = await ProductsService.getAll();
-//   return res.status(OK).json({ products });
-// };
+const getAll = async (_req, res, _next) => {
+  const sales = await SalesService.getAll();
+  return res.status(OK).json({ sales });
+};
 
-// const getById = async (req, res, next) => {
-//   const { id } = req.params;
-//   const product = await ProductsService.getById(id);
-//   const { err } = product;
-//   if (err) return next(err);
-//   return res.status(OK).json(product);
-// };
+const getById = async (req, res, next) => {
+  const { id } = req.params;
+  const sale = await SalesService.getById(id);
+  const { err } = sale;
+  if (err) return next(err);
+  return res.status(OK).json(sale);
+};
 
 // const update = async (req, res, next) => {
 //   const { error } = Joi.object({
@@ -52,8 +52,8 @@ const create = async (req, res, next) => {
 
 module.exports = {
   create,
-  // getAll,
-  // getById,
+  getAll,
+  getById,
   // update,
   // remove,
 };

@@ -684,10 +684,10 @@ describe('6 - Controller - Ao chamar o controller de busca de vendas', () => {
 
     describe('quando o id é válido', () => {
       before(() => {
-        request.params = { id: products[0]._id };
+        request.params = { id: sales._id };
         response.status = sinon.stub().returns(response);
         response.json = sinon.stub().returns();
-        sinon.stub(SalesService, 'getById').resolves(sales[0]);
+        sinon.stub(SalesService, 'getById').resolves(sales);
       });
 
       after(() => {
@@ -701,7 +701,7 @@ describe('6 - Controller - Ao chamar o controller de busca de vendas', () => {
 
       it('é chamado o json com o produto', async () => {
         await SalesController.getById(request, response);
-        expect(response.json.calledWith(sales[0])).to.be.equal(true);
+        expect(response.json.calledWith(sales)).to.be.equal(true);
       });
     });
   });

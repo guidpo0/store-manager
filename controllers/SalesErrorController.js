@@ -1,4 +1,6 @@
-const { UNPROCESSABLE_ENTITY, INTERNAL_SERVER_ERROR } = require('../helpers/HTTPCodes');
+const {
+  UNPROCESSABLE_ENTITY, INTERNAL_SERVER_ERROR, NOT_FOUND,
+} = require('../helpers/HTTPCodes');
 
 const SalesErrorController = (err, _req, res, _next) => {
   if (err.isJoi) {
@@ -7,6 +9,9 @@ const SalesErrorController = (err, _req, res, _next) => {
   }
   if (err.code === 'invalid_data') {
     return res.status(UNPROCESSABLE_ENTITY).json({ err });
+  }
+  if (err.code === 'not_found') {
+    return res.status(NOT_FOUND).json({ err });
   }
   const serverError = { code: 'internal_error', message: 'Erro de servidor' };
   res.status(INTERNAL_SERVER_ERROR).json({ err: serverError });
