@@ -231,3 +231,63 @@ describe('5 - Model - Insere uma nova venda no BD', () => {
     });
   });
 });
+
+describe('6 - Model - Busca vendas no BD,', () => {
+  describe('trazendo todas cadastradas.', () => {
+    before(async () => {
+      await mongoConnectionStub();
+      await SalesModel.create(payloadSales);
+    });
+  
+    after(() => {
+      mongoConnection.getConnection.restore();
+    });
+
+    it('retorna um array', async () => {
+      const response = await SalesModel.getAll();
+      expect(response).to.be.a('array');
+    });
+
+    it('é um array de objetos com _id e itensSold', async () => {
+      const response = await SalesModel.getAll();
+      expect(response[0]).to.have.a.property('_id');
+      expect(response[0]).to.have.a.property('itensSold');
+    });
+
+    it('deve existir uma venda com o id do produto vendido cadastrado!', async () => {
+      const response = await SalesModel.getAll();
+      const responseContaisSale = response[0].itensSold.some(
+        ({ productId }) => productId === payloadSales[0].productId,
+      );
+      expect(responseContaisSale).to.be.equal(true);
+    });
+  });
+
+  describe('trazendo uma venda pelo ID', () => {
+    before(async () => {
+      await mongoConnectionStub();
+      const response = await SalesModel.create(payloadSales);
+      id = response._id;
+    });
+  
+    after(() => {
+      mongoConnection.getConnection.restore();
+    });
+
+    it('retorna um objeto.', async () => {
+      const response = await SalesModel.getById(id);
+      expect(response).to.be.a('object');
+    });
+
+    it('é um objeto com _id e itensSold', async () => {
+      const response = await SalesModel.getById(id);
+      expect(response).to.have.a.property('_id');
+      expect(response).to.have.a.property('itensSold');
+    });
+
+    it('se o id passado não estiver cadastrado retorna null', async () => {
+      const response = await SalesModel.getById('example');
+      expect(response).to.be.equal(null);
+    });
+  });
+});
