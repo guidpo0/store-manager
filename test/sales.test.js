@@ -194,7 +194,7 @@ describe('5 - Crie um endpoint para cadastrar vendas', () => {
   });
 });
 
-describe.skip('6 - Crie um endpoint para listar as vendas', () => {
+describe('6 - Crie um endpoint para listar as vendas', () => {
   let connection;
   let db;
 
