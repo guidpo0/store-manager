@@ -17,7 +17,7 @@ const ID_EXAMPLE = '604ab554311d68f491ba5781';
 const payloadSales = [
   {
     productId: ID_EXAMPLE,
-    ...payloadProduct,
+    quantity: payloadProduct.quantity,
   },
 ];
 
@@ -328,6 +328,89 @@ describe('5 - Service - Insere uma nova venda no BD', () => {
       const response = await SalesService.create(payloadSales);
       expect(response.itensSold[0]).to.have.a.property('productId');
       expect(response.itensSold[0]).to.have.a.property('quantity');
+    });
+  });
+});
+
+describe('6 - Service - Busca vendas no BD,', () => {
+  describe('trazendo todas cadastradas.', () => {
+    before(async () => {
+      sinon.stub(SalesModel, 'getAll').resolves([{ itensSold:payloadSales, _id: ID_EXAMPLE }]);
+    });
+  
+    after(() => {
+      SalesModel.getAll.restore();
+    });
+
+    it('retorna um array', async () => {
+      const response = await SalesService.getAll();
+      expect(response).to.be.a('array');
+    });
+
+    it('tal array, possui um objeto com _id e itensSold', async () => {
+      const response = await SalesService.getAll();
+      expect(response[0]).to.have.a.property('_id');
+      expect(response[0]).to.have.a.property('itensSold');
+    });
+
+    it('tal objeto corresponde ao que está cadastrado no BD', async () => {
+      const response = await SalesService.getAll();
+      expect(response[0]._id).to.be.equal(ID_EXAMPLE);
+      expect(response[0].itensSold).to.be.equal(payloadSales);
+    });
+  });
+
+  describe('trazendo uma venda pelo ID', () => {
+    describe('em caso de falha', () => {
+      before(async () => {
+        sinon.stub(SalesModel, 'getById').resolves(null);
+      });
+    
+      after(() => {
+        SalesModel.getById.restore();
+      });
+      
+      it('retorna um objeto', async () => {
+        const response = await SalesService.getById(ID_EXAMPLE);
+        expect(response).to.be.a('object');
+      });
+      
+      it('o objeto error contém "code" e "message"', async () => {
+        const response = await SalesService.getById(ID_EXAMPLE);
+        expect(response.err).to.have.a.property('code');
+        expect(response.err).to.have.a.property('message');
+      });
+  
+      it('"code" é "not_found"', async () => {
+        const response = await SalesService.getById(ID_EXAMPLE);
+        expect(response.err.code).to.be.a('string', 'not_found');
+      });
+  
+      it('"message" é "Sale not found"', async () => {
+        const response = await SalesService.getById(ID_EXAMPLE);
+        expect(response.err.message).to.be.a('string', 'Sale not found');
+      });
+    });
+
+    describe('em caso de sucesso', () => {
+      before(async () => {
+        sinon.stub(SalesModel, 'getById').resolves({ itensSold: payloadSales, _id: ID_EXAMPLE });
+      });
+    
+      after(() => {
+        SalesModel.getById.restore();
+      });
+
+      it('retorna um objeto', async () => {
+        const response = await SalesService.getById(ID_EXAMPLE);
+        expect(response).to.be.a('object');
+      });
+      
+      it('o objeto possui _id e itensSold', async () => {
+        const response = await SalesService.getById(ID_EXAMPLE);
+        expect(response).to.have.a.property('_id');
+        expect(response).to.have.a.property('itensSold');
+      });
     });
   });
 });
