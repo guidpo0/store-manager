@@ -204,11 +204,60 @@ describe('3 - Service - Atualiza um produto no BD', () => {
       expect(response).to.have.a.property('name');
       expect(response).to.have.a.property('quantity');
     });
+  });
+});
 
-    it('deve existir um produto com o id com o nome cadastrado.', async () => {
-      const response = await ProductsService.update({ _id: ID_EXAMPLE, ...payloadProduct });
-      const responseContaisProduct = response.name === payloadProduct.name;
-      expect(responseContaisProduct).to.be.equal(true);
+describe('4 - Service - Exclui um produto no BD', () => {
+  describe('em caso de falha', () => {
+    before(async () => {
+      sinon.stub(ProductsModel, 'remove').resolves(null);
+    });
+  
+    after(() => {
+      ProductsModel.remove.restore();
+    });
+    
+    it('retorna um objeto', async () => {
+      const response = await ProductsService.remove(ID_EXAMPLE);
+      expect(response).to.be.a('object');
+    });
+    
+    it('o objeto error contém "code" e "message"', async () => {
+      const response = await ProductsService.remove(ID_EXAMPLE);
+      expect(response.err).to.have.a.property('code');
+      expect(response.err).to.have.a.property('message');
+    });
+
+    it('"code" é "invalid_data"', async () => {
+      const response = await ProductsService.remove(ID_EXAMPLE);
+      expect(response.err.code).to.be.a('string', 'invalid_data');
+    });
+
+    it('"message" é "Wrong id format"', async () => {
+      const response = await ProductsService.remove(ID_EXAMPLE);
+      expect(response.err.message).to.be.a('string', 'Wrong id format');
+    });
+  });
+
+  describe('em caso de sucesso', () => {
+    before(async () => {
+      sinon.stub(ProductsModel, 'remove').resolves({ _id: ID_EXAMPLE, ...payloadProduct });
+    });
+  
+    after(() => {
+      ProductsModel.remove.restore();
+    });
+
+    it('retorna um objeto', async () => {
+      const response = await ProductsService.remove(ID_EXAMPLE);
+      expect(response).to.be.a('object');
+    });
+    
+    it('o objeto possui _id, name e quantity.', async () => {
+      const response = await ProductsService.remove(ID_EXAMPLE);
+      expect(response).to.have.a.property('_id');
+      expect(response).to.have.a.property('name');
+      expect(response).to.have.a.property('quantity');
     });
   });
 });
