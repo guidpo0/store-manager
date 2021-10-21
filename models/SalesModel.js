@@ -27,17 +27,17 @@ const getById = async (_id) => {
   return null;
 };
 
-// const update = async ({ _id, name, quantity }) => {
-//   if (ObjectId.isValid(_id)) {
-//     return mongoConnection.getConnection().then(
-//       (db) => db.collection('products').updateOne(
-//         { _id: Object(_id) },
-//         { $set: { name, quantity } },
-//       ),
-//     ).then(() => getById(_id));
-//   }
-//   return null;
-// };
+const update = async ({ _id, itensSold }) => {
+  if (ObjectId.isValid(_id)) {
+    return mongoConnection.getConnection().then(
+      (db) => db.collection('sales').updateOne(
+        { _id: Object(_id) },
+        { $set: { itensSold } },
+      ),
+    ).then(() => getById(_id));
+  }
+  return null;
+};
 
 // const remove = async (_id) => {
 //   if (ObjectId.isValid(_id)) {
@@ -55,6 +55,6 @@ module.exports = {
   create,
   getAll,
   getById,
-  // update,
+  update,
   // remove,
 };
