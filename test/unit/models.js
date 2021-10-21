@@ -27,11 +27,11 @@ const payloadProduct = {
 };
 const payloadSales = [
   {
-    producId: '604cb554311d68f491ba5781',
+    productId: '604cb554311d68f491ba5781',
     ...payloadProduct,
   },
   {
-    producId: '604df554311d68f491ba5781',
+    productId: '604df554311d68f491ba5781',
     ...payloadProduct,
   },
 ];
@@ -206,7 +206,7 @@ describe('5 - Model - Insere uma nova venda no BD', () => {
 
     it('retorna um objeto', async () => {
       const response = await SalesModel.create(payloadSales);
-      expect(response).to.be.a('objeto');
+      expect(response).to.be.a('object');
     });
 
     it('tal objeto possuem o "_id" e "itensSold"', async () => {
@@ -225,7 +225,7 @@ describe('5 - Model - Insere uma nova venda no BD', () => {
       await SalesModel.create(payloadSales);
       const salesCollection = await connectionMock.collection('sales');
       const saleCreated = await salesCollection.findOne(
-        { 'itensSold.0.productId': payloadSale[0].productId },
+        { 'itensSold.0.productId': payloadSales[0].productId },
       );
       expect(saleCreated).to.be.not.null;
     });
