@@ -38,9 +38,23 @@ const update = async ({ _id, name, quantity }) => {
   return null;
 };
 
+const remove = async (_id) => {
+  if (ObjectId.isValid(_id)) {
+    const product = await getById(_id);
+    console.log(product);
+    return mongoConnection.getConnection().then(
+      (db) => db.collection('products').deleteOne(
+        { _id: Object(_id) },
+      ),
+    ).then(() => product);
+  }
+  return null;
+};
+
 module.exports = {
   create,
   getAll,
   getById,
   update,
+  remove,
 };

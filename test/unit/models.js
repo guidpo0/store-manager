@@ -174,30 +174,31 @@ describe('4 - Model - Exclui um produto no BD', () => {
   let id;
   
   describe('quando é excluído com sucesso', () => {
-    before(async ()=> {
-      await mongoConnectionStub();
+    beforeEach(async ()=> {
       const productId = await ProductsModel.create(payloadProduct);
       id = productId._id;
     });
+
+    before(mongoConnectionStub);
   
     after(() => {
       mongoConnection.getConnection.restore();
     });
 
     it('retorna um objeto', async () => {
-      const response = await ProductsModel.delete({ _id: id, ...payloadProduct });
+      const response = await ProductsModel.remove(id);
       expect(response).to.be.a('object');
     });
 
     it('tal objeto possui o "_id", "name" e "quantity" do produto excluído', async () => {
-      const response = await ProductsModel.delete({ _id: id, ...payloadProduct });
+      const response = await ProductsModel.remove(id);
       expect(response).to.have.a.property('_id');
       expect(response).to.have.a.property('name');
       expect(response).to.have.a.property('quantity');
     });
 
     it('não deve existir um produto com o id excluído', async () => {
-      await ProductsModel.delete({ _id: id, ...payloadProduct });
+      await ProductsModel.remove(id);
       const productsCollection = await connectionMock.collection('products');
       const product = await productsCollection.findOne(ObjectId(id));
       expect(product).to.be.null;
