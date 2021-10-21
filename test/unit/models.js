@@ -164,7 +164,7 @@ describe('3 - Model - Atualiza um produto no BD', () => {
 
 describe('4 - Model - Exclui um produto no BD', () => {
   describe('quando é excluído com sucesso', () => {
-    beforeEach(async ()=> {
+    beforeEach(async () => {
       const productId = await ProductsModel.create(payloadProduct);
       id = productId._id;
     });

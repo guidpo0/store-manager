@@ -418,10 +418,12 @@ describe('6 - Service - Busca vendas no BD,', () => {
 describe('7 - Service - Atualiza uma venda no BD', () => {
   describe('em caso de falha', () => {
     before(async () => {
+      sinon.stub(ProductsModel, 'getById').resolves(null);
       sinon.stub(SalesModel, 'update').resolves(null);
     });
-  
+    
     after(() => {
+      ProductsModel.getById.restore();
       SalesModel.update.restore();
     });
     
@@ -449,10 +451,14 @@ describe('7 - Service - Atualiza uma venda no BD', () => {
 
   describe('em caso de sucesso', () => {
     before(async () => {
+      sinon.stub(SalesModel, 'getById').resolves({ _id: ID_EXAMPLE, payloadSales });
+      sinon.stub(ProductsModel, 'getById').resolves({ _id: ID_EXAMPLE, ...payloadProduct });
       sinon.stub(SalesModel, 'update').resolves({ _id: ID_EXAMPLE, itensSold: payloadSales });
     });
-  
+    
     after(() => {
+      SalesModel.getById.restore();
+      ProductsModel.getById.restore();
       SalesModel.update.restore();
     });
 
@@ -462,7 +468,7 @@ describe('7 - Service - Atualiza uma venda no BD', () => {
     });
     
     it('o objeto possui _id e itensSold', async () => {
-      const response = await SalesService.update({ _id: ID_EXAMPLE, ...payloadProduct });
+      const response = await SalesService.update({ _id: ID_EXAMPLE, itensSold: payloadSales });
       expect(response).to.have.a.property('_id');
       expect(response).to.have.a.property('itensSold');
     });
@@ -472,10 +478,12 @@ describe('7 - Service - Atualiza uma venda no BD', () => {
 describe('8 - Service - Exclui uma venda no BD', () => {
   describe('em caso de falha', () => {
     before(async () => {
+      sinon.stub(SalesModel, 'getById').resolves(null);
       sinon.stub(SalesModel, 'remove').resolves(null);
     });
   
     after(() => {
+      SalesModel.getById.restore();
       SalesModel.remove.restore();
     });
     
@@ -504,10 +512,12 @@ describe('8 - Service - Exclui uma venda no BD', () => {
   describe('em caso de sucesso', () => {
     before(async () => {
       sinon.stub(SalesModel, 'remove').resolves({ _id: ID_EXAMPLE, itensSold: payloadSales });
+      sinon.stub(SalesModel, 'getById').resolves({ _id: ID_EXAMPLE, itensSold: payloadSales });
     });
   
     after(() => {
       SalesModel.remove.restore();
+      SalesModel.getById.restore();
     });
 
     it('retorna um objeto', async () => {
