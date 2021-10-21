@@ -291,3 +291,40 @@ describe('6 - Model - Busca vendas no BD,', () => {
     });
   });
 });
+
+describe('7 - Model - Atualiza uma venda no BD', () => {
+  describe('quando é atualizado com sucesso', () => {
+    before(async ()=> {
+      await mongoConnectionStub();
+      const saleId = await SalesModel.create(payloadSales);
+      id = saleId._id;
+    });
+  
+    after(() => {
+      mongoConnection.getConnection.restore();
+    });
+
+    it('retorna um objeto', async () => {
+      const response = await SalesModel.update({ _id: id, itensSold: payloadsales });
+      expect(response).to.be.a('object');
+    });
+
+    it('tal objeto possui o "_id" e itensSold', async () => {
+      const response = await SalesModel.update({ _id: id, itensSold: payloadsales });
+      expect(response).to.have.a.property('_id');
+      expect(response).to.have.a.property('itensSold');
+    });
+
+    it('deve existir uma venda com o id e quantity de produto atualizado', async () => {
+      await SalesModel.update({ _id: id, itensSold: payloadsales });
+      const salesCollection = await connectionMock.collection('sales');
+      const saleUpdated = await salesCollection.findOne(
+        { $and: [
+          { 'itensSold.0.productId': payloadSales[0].productId },
+          { 'itensSold.0.quantity': payloadSales[0].quantity },
+        ] }
+      );
+      expect(saleUpdated).to.be.not.null;
+    });
+  });
+});
