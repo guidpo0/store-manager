@@ -15,14 +15,17 @@ const products = [{
   quantity: 2000,
 }];
 const sales = {
+  _id: '55454454',
   itensSold: [
     {
       productId: '604cb554311d68f491ba5781',
-      ...payloadProduct,
+      name: 'Example Product',
+      quantity: 2000,
     },
     {
       productId: '604df554311d68f491ba5781',
-      ...payloadProduct,
+      name: 'Example 2 Product',
+      quantity: 2000,
     },
   ],
 };
@@ -603,10 +606,10 @@ describe('5 - Controller - Ao chamar o controller de create para sales', () => {
 
   describe('quando é inserido com sucesso', () => {
     before(() => {
-      request.body = [{ name: 'Example Product', quantity: 2000 }];
+      request.body = [{ productId: 'Example Product', quantity: 2000 }];
       response.status = sinon.stub().returns(response);
       response.json = sinon.stub().returns();
-      sinon.stub(SalesService, 'create').resolves(sales.itensSold);
+      sinon.stub(SalesService, 'create').resolves(sales);
     });
   
     after(() => {

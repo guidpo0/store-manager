@@ -1,6 +1,5 @@
 const express = require('express');
 const productsRouter = require('./routes/productsRouter');
-const ErrorController = require('./controllers/ErrorController');
 
 const PORT = 3000;
 const app = express();
@@ -12,7 +11,5 @@ app.get('/', (_request, response) => {
 });
 
 app.use('/products', productsRouter);
-
-app.use(ErrorController);
 
 app.listen(PORT, () => { console.log(`Ouvindo a porta ${PORT}`); });
