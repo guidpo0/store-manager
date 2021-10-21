@@ -18,20 +18,20 @@ const create = async (products) => {
   return SalesModel.create(products);
 };
 
-// const getAll = async () => ProductsModel.getAll();
+const getAll = async () => SalesModel.getAll();
 
-// const getById = async (_id) => {
-//   const product = await ProductsModel.getById(_id);
-//   if (!product) {
-//     return {
-//       err: {
-//         code: 'invalid_data',
-//         message: 'Wrong id format',
-//       },
-//     };
-//   }
-//   return product;
-// };
+const getById = async (_id) => {
+  const sale = await SalesModel.getById(_id);
+  if (!sale) {
+    return {
+      err: {
+        code: 'not_found',
+        message: 'Sale not found',
+      },
+    };
+  }
+  return sale;
+};
 
 // const update = async ({ _id, name, quantity }) => {
 //   const product = await ProductsModel.update({ _id, name, quantity });
@@ -61,8 +61,8 @@ const create = async (products) => {
 
 module.exports = {
   create,
-  // getAll,
-  // getById,
+  getAll,
+  getById,
   // update,
   // remove,
 };
