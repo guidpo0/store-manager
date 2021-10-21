@@ -281,23 +281,23 @@ describe('5 - Service - Insere uma nova venda no BD', () => {
     });
 
     it('retorna um objeto', async () => {
-      const response = await SalesService.create(payloadProduct);
+      const response = await SalesService.create(payloadSales);
       expect(response).to.be.a('object');
     });
 
     it('o objeto error contém "code" e "message"', async () => {
-      const response = await SalesService.create(payloadProduct);
+      const response = await SalesService.create(payloadSales);
       expect(response.err).to.have.a.property('code');
       expect(response.err).to.have.a.property('message');
     });
 
     it('"code" é "invalid_data"', async () => {
-      const response = await SalesService.create(payloadProduct);
+      const response = await SalesService.create(payloadSales);
       expect(response.err.code).to.be.a('string', 'invalid_data');
     });
 
     it('"message" é "Wrong Product Id or invalid quantity"', async () => {
-      const response = await SalesService.create(payloadProduct);
+      const response = await SalesService.create(payloadSales);
       expect(response.err.message).to.be.a('string', 'Wrong Product Id or invalid quantity');
     });
   });
