@@ -437,3 +437,58 @@ describe('3 - Controller - Ao chamar o controller de update para produtos', () =
     });
   });
 });
+
+describe('4 - Controller - Ao chamar o controller para apagar um produto', () => {
+  describe('quando o id não é válido', () => {
+    before(() => {
+      request.params = { id: products[0]._id };
+      response.status = sinon.stub().returns(response);
+      response.json = sinon.stub().returns();
+      sinon.stub(ProductsService, 'remove').resolves({ err: {
+        code: 'invalid_data',
+        message: 'Wrong id format',
+      }});
+      next = (error) => ErrorController(error, request, response);
+    });
+
+    after(() => {
+      ProductsService.remove.restore();
+    });
+
+    it('é chamado o status com o código 422', async () => {
+      await ProductsController.remove(request, response, next);
+      expect(response.status.calledWith(422)).to.be.equal(true);
+    });
+
+    it('é chamado o json com os produtos', async () => {
+      await ProductsController.remove(request, response, next);
+      expect(response.json.calledWith({ err: {
+        code: 'invalid_data',
+        message: 'Wrong id format',
+      }})).to.be.equal(true);
+    });
+  });
+
+  describe('quando o id é válido', () => {
+    before(() => {
+      request.params = { id: products[0]._id };
+      response.status = sinon.stub().returns(response);
+      response.json = sinon.stub().returns();
+      sinon.stub(ProductsService, 'remove').resolves(products[0]);
+    });
+
+    after(() => {
+      ProductsService.remove.restore();
+    });
+
+    it('é chamado o status com o código 200', async () => {
+      await ProductsController.remove(request, response);
+      expect(response.status.calledWith(200)).to.be.equal(true);
+    });
+
+    it('é chamado o json com o produto', async () => {
+      await ProductsController.remove(request, response);
+      expect(response.json.calledWith(products[0])).to.be.equal(true);
+    });
+  });
+});

@@ -40,9 +40,18 @@ const update = async (req, res, next) => {
   return res.status(OK).json({ _id, name, quantity });
 };
 
+const remove = async (req, res, next) => {
+  const { id } = req.params;
+  const product = await ProductsService.remove(id);
+  const { err } = product;
+  if (err) return next(err);
+  return res.status(OK).json(product);
+};
+
 module.exports = {
   create,
   getAll,
   getById,
   update,
+  remove,
 };
