@@ -39,22 +39,22 @@ const update = async ({ _id, itensSold }) => {
   return null;
 };
 
-// const remove = async (_id) => {
-//   if (ObjectId.isValid(_id)) {
-//     const product = await getById(_id);
-//     return mongoConnection.getConnection().then(
-//       (db) => db.collection('products').deleteOne(
-//         { _id: ObjectId(_id) },
-//       ),
-//     ).then(() => product);
-//   }
-//   return null;
-// };
+const remove = async (_id) => {
+  if (ObjectId.isValid(_id)) {
+    const sale = await getById(_id);
+    return mongoConnection.getConnection().then(
+      (db) => db.collection('sales').deleteOne(
+        { _id: ObjectId(_id) },
+      ),
+    ).then(() => sale);
+  }
+  return null;
+};
 
 module.exports = {
   create,
   getAll,
   getById,
   update,
-  // remove,
+  remove,
 };
