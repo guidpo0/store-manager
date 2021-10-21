@@ -29,18 +29,20 @@ const getById = async (req, res, next) => {
   return res.status(OK).json(sale);
 };
 
-// const update = async (req, res, next) => {
-//   const { error } = Joi.object({
-//     name: Joi.string().min(5).required(),
-//     quantity: Joi.number().integer().min(1).required(),
-//   }).validate(req.body);
-//   if (error) return next(error);
-//   const { name, quantity } = req.body;
-//   const { id } = req.params;
-//   const { _id, err: invalidId } = await ProductsService.update({ _id: id, name, quantity });
-//   if (invalidId) return next(invalidId);
-//   return res.status(OK).json({ _id, name, quantity });
-// };
+const update = async (req, res, next) => {
+  const { error } = Joi.array().items(
+    Joi.object({
+      productId: Joi.string().required(),
+      quantity: Joi.number().integer().min(1).required(),
+    }),
+  ).validate(req.body);
+  if (error) return next(error);
+  const { body } = req;
+  const { id } = req.params;
+  const { _id, err: invalidId } = await SalesService.update({ _id: id, itensSold: body });
+  if (invalidId) return next(invalidId);
+  return res.status(OK).json({ _id, itensSold: body });
+};
 
 // const remove = async (req, res, next) => {
 //   const { id } = req.params;
@@ -54,6 +56,6 @@ module.exports = {
   create,
   getAll,
   getById,
-  // update,
+  update,
   // remove,
 };

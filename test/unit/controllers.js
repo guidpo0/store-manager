@@ -718,9 +718,9 @@ describe('7 - Controller - Ao chamar o controller de update para vendas', () => 
         next = (error) => SalesErrorController(error, request, response);
       });
   
-      it('é chamado o status com o código 404', async () => {
+      it('é chamado o status com o código 422', async () => {
         await SalesController.update(request, response, next);
-        expect(response.status.calledWith(404)).to.be.equal(true);
+        expect(response.status.calledWith(422)).to.be.equal(true);
       });
   
       it('é chamado o json com o código "invalid_data" e a mensagem referente', async () => {
@@ -741,9 +741,9 @@ describe('7 - Controller - Ao chamar o controller de update para vendas', () => 
         next = (error) => SalesErrorController(error, request, response);
       });
   
-      it('é chamado o status com o código 404', async () => {
+      it('é chamado o status com o código 422', async () => {
         await SalesController.update(request, response, next);
-        expect(response.status.calledWith(404)).to.be.equal(true);
+        expect(response.status.calledWith(422)).to.be.equal(true);
       });
   
       it('é chamado o json com o código "invalid_data" e a mensagem referente', async () => {
@@ -764,9 +764,9 @@ describe('7 - Controller - Ao chamar o controller de update para vendas', () => 
         next = (error) => SalesErrorController(error, request, response);
       });
   
-      it('é chamado o status com o código 404', async () => {
+      it('é chamado o status com o código 422', async () => {
         await SalesController.update(request, response, next);
-        expect(response.status.calledWith(404)).to.be.equal(true);
+        expect(response.status.calledWith(422)).to.be.equal(true);
       });
   
       it('é chamado o json com o código "invalid_data" e a mensagem respectiva', async () => {
@@ -787,9 +787,9 @@ describe('7 - Controller - Ao chamar o controller de update para vendas', () => 
         next = (error) => SalesErrorController(error, request, response);
       });
   
-      it('é chamado o status com o código 404', async () => {
+      it('é chamado o status com o código 422', async () => {
         await SalesController.update(request, response, next);
-        expect(response.status.calledWith(404)).to.be.equal(true);
+        expect(response.status.calledWith(422)).to.be.equal(true);
       });
   
       it('é chamado o json com o código "invalid_data" e a mensagem respectiva', async () => {
