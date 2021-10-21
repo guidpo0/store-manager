@@ -2,7 +2,10 @@ const sinon = require('sinon');
 const { expect } = require('chai');
 const ProductsService = require('../../services/ProductsService');
 const ProductsController = require('../../controllers/ProductsController');
-const ErrorController = require('../../controllers/ErrorController');
+const ProductsErrorController = require('../../controllers/ProductsErrorController');
+const SalesService = require('../../services/SalesService');
+const SalesController = require('../../controllers/SalesController');
+const SalesErrorController = require('../../controllers/SalesErrorController');
 
 const response = {};
 const request = {};
@@ -11,6 +14,19 @@ const products = [{
   name: 'Example Product',
   quantity: 2000,
 }];
+const sales = {
+  itensSold: [
+    {
+      productId: '604cb554311d68f491ba5781',
+      ...payloadProduct,
+    },
+    {
+      productId: '604df554311d68f491ba5781',
+      ...payloadProduct,
+    },
+  ],
+};
+
 const ID_EXAMPLE = '604cb554311d68f491ba5781';
 let next = {};
 
@@ -21,7 +37,7 @@ describe('1 - Controller - Ao chamar o controller de create para produtos', () =
         request.body = { quantity: 1 };
         response.status = sinon.stub().returns(response);
         response.json = sinon.stub().returns();
-        next = (error) => ErrorController(error, request, response);
+        next = (error) => ProductsErrorController(error, request, response);
       });
   
       it('é chamado o status com o código 422', async () => {
@@ -43,7 +59,7 @@ describe('1 - Controller - Ao chamar o controller de create para produtos', () =
         request.body = { name: 'Example' };
         response.status = sinon.stub().returns(response);
         response.json = sinon.stub().returns();
-        next = (error) => ErrorController(error, request, response);
+        next = (error) => ProductsErrorController(error, request, response);
       });
   
       it('é chamado o status com o código 422', async () => {
@@ -65,7 +81,7 @@ describe('1 - Controller - Ao chamar o controller de create para produtos', () =
         request.body = { name: 'Exam', quantity: 1 };
         response.status = sinon.stub().returns(response);
         response.json = sinon.stub().returns();
-        next = (error) => ErrorController(error, request, response);
+        next = (error) => ProductsErrorController(error, request, response);
       });
   
       it('é chamado o status com o código 422', async () => {
@@ -87,7 +103,7 @@ describe('1 - Controller - Ao chamar o controller de create para produtos', () =
         request.body = { name: 'Example', quantity: 0 };
         response.status = sinon.stub().returns(response);
         response.json = sinon.stub().returns();
-        next = (error) => ErrorController(error, request, response);
+        next = (error) => ProductsErrorController(error, request, response);
       });
   
       it('é chamado o status com o código 422', async () => {
@@ -109,7 +125,7 @@ describe('1 - Controller - Ao chamar o controller de create para produtos', () =
         request.body = { name: 'Example', quantity: 'a' };
         response.status = sinon.stub().returns(response);
         response.json = sinon.stub().returns();
-        next = (error) => ErrorController(error, request, response);
+        next = (error) => ProductsErrorController(error, request, response);
       });
   
       it('é chamado o status com o código 422', async () => {
@@ -131,7 +147,7 @@ describe('1 - Controller - Ao chamar o controller de create para produtos', () =
         request.body = { name: 'Example', quantity: 100 };
         response.status = sinon.stub().returns(response);
         response.json = sinon.stub().returns();
-        next = (error) => ErrorController(error, request, response);
+        next = (error) => ProductsErrorController(error, request, response);
         sinon.stub(ProductsService, 'create').resolves({
           err: {
             code: 'invalid_data',
@@ -157,7 +173,6 @@ describe('1 - Controller - Ao chamar o controller de create para produtos', () =
         }})).to.be.equal(true);
       });
     });
-
   });
 
   describe('quando é inserido com sucesso', () => {
@@ -217,7 +232,7 @@ describe('2 - Controller - Ao chamar o controller de busca de produtos', () => {
           code: 'invalid_data',
           message: 'Wrong id format',
         }});
-        next = (error) => ErrorController(error, request, response);
+        next = (error) => ProductsErrorController(error, request, response);
       });
 
       after(() => {
@@ -271,7 +286,7 @@ describe('3 - Controller - Ao chamar o controller de update para produtos', () =
         request.params = { id: ID_EXAMPLE };
         response.status = sinon.stub().returns(response);
         response.json = sinon.stub().returns();
-        next = (error) => ErrorController(error, request, response);
+        next = (error) => ProductsErrorController(error, request, response);
       });
   
       it('é chamado o status com o código 422', async () => {
@@ -294,7 +309,7 @@ describe('3 - Controller - Ao chamar o controller de update para produtos', () =
         request.params = { id: ID_EXAMPLE };
         response.status = sinon.stub().returns(response);
         response.json = sinon.stub().returns();
-        next = (error) => ErrorController(error, request, response);
+        next = (error) => ProductsErrorController(error, request, response);
       });
   
       it('é chamado o status com o código 422', async () => {
@@ -317,7 +332,7 @@ describe('3 - Controller - Ao chamar o controller de update para produtos', () =
         request.params = { id: ID_EXAMPLE };
         response.status = sinon.stub().returns(response);
         response.json = sinon.stub().returns();
-        next = (error) => ErrorController(error, request, response);
+        next = (error) => ProductsErrorController(error, request, response);
       });
   
       it('é chamado o status com o código 422', async () => {
@@ -340,7 +355,7 @@ describe('3 - Controller - Ao chamar o controller de update para produtos', () =
         request.params = { id: ID_EXAMPLE };
         response.status = sinon.stub().returns(response);
         response.json = sinon.stub().returns();
-        next = (error) => ErrorController(error, request, response);
+        next = (error) => ProductsErrorController(error, request, response);
       });
   
       it('é chamado o status com o código 422', async () => {
@@ -363,7 +378,7 @@ describe('3 - Controller - Ao chamar o controller de update para produtos', () =
         request.params = { id: ID_EXAMPLE };
         response.status = sinon.stub().returns(response);
         response.json = sinon.stub().returns();
-        next = (error) => ErrorController(error, request, response);
+        next = (error) => ProductsErrorController(error, request, response);
       });
   
       it('é chamado o status com o código 422', async () => {
@@ -386,7 +401,7 @@ describe('3 - Controller - Ao chamar o controller de update para produtos', () =
         request.params = { id: 'dffd4545' };
         response.status = sinon.stub().returns(response);
         response.json = sinon.stub().returns();
-        next = (error) => ErrorController(error, request, response);
+        next = (error) => ProductsErrorController(error, request, response);
         sinon.stub(ProductsService, 'update').resolves({
           err: {
             code: 'invalid_data',
@@ -448,7 +463,7 @@ describe('4 - Controller - Ao chamar o controller para apagar um produto', () =>
         code: 'invalid_data',
         message: 'Wrong id format',
       }});
-      next = (error) => ErrorController(error, request, response);
+      next = (error) => ProductsErrorController(error, request, response);
     });
 
     after(() => {
@@ -489,6 +504,123 @@ describe('4 - Controller - Ao chamar o controller para apagar um produto', () =>
     it('é chamado o json com o produto', async () => {
       await ProductsController.remove(request, response);
       expect(response.json.calledWith(products[0])).to.be.equal(true);
+    });
+  });
+});
+
+describe('5 - Controller - Ao chamar o controller de create para sales', () => {
+  describe('quando o payload informado não é válido pois', () => {
+    describe('o objeto dentro do array enviado no body não tem a chave productId,', () => {
+      before(() => {
+        request.body = [{ quantity: 1 }];
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns();
+        next = (error) => SalesErrorController(error, request, response);
+      });
+  
+      it('é chamado o status com o código 422', async () => {
+        await SalesController.create(request, response, next);
+        expect(response.status.calledWith(422)).to.be.equal(true);
+      });
+  
+      it('é chamado o json com o código "invalid_data" e a mensagem respectiva', async () => {
+        await SalesController.create(request, response, next);
+        expect(response.json.calledWith({ err: {
+          code: 'invalid_data',
+          message: 'Wrong product ID or invalid quantity',
+        }})).to.be.equal(true);
+      });
+    });
+
+    describe('o objeto dentro do array enviado no body não tem a chave quantity,', () => {
+      before(() => {
+        request.body = [{ productId: 'Example' }];
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns();
+        next = (error) => SalesErrorController(error, request, response);
+      });
+  
+      it('é chamado o status com o código 422 e json de erro', async () => {
+        await SalesController.create(request, response, next);
+        expect(response.status.calledWith(422)).to.be.equal(true);
+        expect(response.json.calledWith({ err: {
+          code: 'invalid_data',
+          message: 'Wrong product ID or invalid quantity',
+        }})).to.be.equal(true);
+      });
+    });
+
+    describe('quantity é menor que 1,', () => {
+      before(() => {
+        request.body = [{ productId: 'Example', quantity: 0 }];
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns();
+        next = (error) => SalesErrorController(error, request, response);
+      });
+  
+      it('é chamado o status com o código 422 e json de erro', async () => {
+        await SalesController.create(request, response, next);
+        expect(response.status.calledWith(422)).to.be.equal(true);
+        expect(response.json.calledWith({ err: {
+          code: 'invalid_data',
+          message: 'Wrong product ID or invalid quantity',
+        }})).to.be.equal(true);
+      });
+    });
+
+    describe('o produto não existe,', () => {
+      before(() => {
+        request.body = { name: 'Example', quantity: 100 };
+        response.status = sinon.stub().returns(response);
+        response.json = sinon.stub().returns();
+        next = (error) => SalesErrorController(error, request, response);
+        sinon.stub(SalesService, 'create').resolves({
+          err: {
+            code: 'invalid_data',
+            message: 'Wrong product ID or invalid quantity',
+          },
+        });
+      });
+  
+      after(() => {
+        SalesService.create.restore();
+      });
+  
+      it('é chamado o status com o código 422', async () => {
+        await SalesController.create(request, response, next);
+        expect(response.status.calledWith(422)).to.be.equal(true);
+      });
+  
+      it('é chamado o json com o código "invalid_data" e a mensagem respectiva', async () => {
+        await SalesController.create(request, response, next);
+        expect(response.json.calledWith({ err: {
+          code: 'invalid_data',
+          message: 'Wrong product ID or invalid quantity',
+        }})).to.be.equal(true);
+      });
+    });
+  });
+
+  describe('quando é inserido com sucesso', () => {
+    before(() => {
+      request.body = [{ name: 'Example Product', quantity: 2000 }];
+      response.status = sinon.stub().returns(response);
+      response.json = sinon.stub().returns();
+      sinon.stub(SalesService, 'create').resolves(sales.itensSold);
+    });
+  
+    after(() => {
+      SalesService.create.restore();
+    });
+
+    it('é chamado o status com o código 201', async () => {
+      await SalesController.create(request, response);
+      expect(response.status.calledWith(201)).to.be.equal(true);
+    });
+
+    it('é chamado o json com as informações do produto', async () => {
+      await SalesController.create(request, response);
+      expect(response.json.calledWith(sales)).to.be.equal(true);
     });
   });
 });
