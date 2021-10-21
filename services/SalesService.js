@@ -33,18 +33,18 @@ const getById = async (_id) => {
   return sale;
 };
 
-// const update = async ({ _id, name, quantity }) => {
-//   const product = await ProductsModel.update({ _id, name, quantity });
-//   if (!product) {
-//     return {
-//       err: {
-//         code: 'invalid_data',
-//         message: 'Wrong id format',
-//       },
-//     };
-//   }
-//   return product;
-// };
+const update = async ({ _id, itensSold }) => {
+  const sale = await SalesModel.update({ _id, itensSold });
+  if (!sale) {
+    return {
+      err: {
+        code: 'invalid_data',
+        message: 'Wrong product ID or invalid quantity',
+      },
+    };
+  }
+  return sale;
+};
 
 // const remove = async (id) => {
 //   const product = await ProductsModel.remove(id);
@@ -63,6 +63,6 @@ module.exports = {
   create,
   getAll,
   getById,
-  // update,
+  update,
   // remove,
 };
