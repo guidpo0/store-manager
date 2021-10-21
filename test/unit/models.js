@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const sinon = require('sinon');
 const mongoConnection = require('../../models/connection');
@@ -162,6 +162,45 @@ describe('3 - Model - Atualiza um produto no BD', () => {
       const productsCollection = await connectionMock.collection('products');
       const productUpdated = await productsCollection.findOne({ name: payloadProduct.name });
       expect(productUpdated).to.be.not.null;
+    });
+  });
+});
+
+describe('4 - Model - Exclui um produto no BD', () => {
+  const payloadProduct = {
+    name: 'Example Product',
+    quantity: 2000,
+  };
+  let id;
+  
+  describe('quando é excluído com sucesso', () => {
+    before(async ()=> {
+      await mongoConnectionStub();
+      const productId = await ProductsModel.create(payloadProduct);
+      id = productId._id;
+    });
+  
+    after(() => {
+      mongoConnection.getConnection.restore();
+    });
+
+    it('retorna um objeto', async () => {
+      const response = await ProductsModel.delete({ _id: id, ...payloadProduct });
+      expect(response).to.be.a('object');
+    });
+
+    it('tal objeto possui o "_id", "name" e "quantity" do produto excluído', async () => {
+      const response = await ProductsModel.delete({ _id: id, ...payloadProduct });
+      expect(response).to.have.a.property('_id');
+      expect(response).to.have.a.property('name');
+      expect(response).to.have.a.property('quantity');
+    });
+
+    it('não deve existir um produto com o id excluído', async () => {
+      await ProductsModel.delete({ _id: id, ...payloadProduct });
+      const productsCollection = await connectionMock.collection('products');
+      const product = await productsCollection.findOne(ObjectId(id));
+      expect(product).to.be.null;
     });
   });
 });
