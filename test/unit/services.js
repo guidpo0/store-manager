@@ -468,3 +468,57 @@ describe('7 - Service - Atualiza uma venda no BD', () => {
     });
   });
 });
+
+describe('8 - Service - Exclui uma venda no BD', () => {
+  describe('em caso de falha', () => {
+    before(async () => {
+      sinon.stub(SalesModel, 'remove').resolves(null);
+    });
+  
+    after(() => {
+      SalesModel.remove.restore();
+    });
+    
+    it('retorna um objeto', async () => {
+      const response = await SalesService.remove(ID_EXAMPLE);
+      expect(response).to.be.a('object');
+    });
+    
+    it('o objeto error contém "code" e "message"', async () => {
+      const response = await SalesService.remove(ID_EXAMPLE);
+      expect(response.err).to.have.a.property('code');
+      expect(response.err).to.have.a.property('message');
+    });
+
+    it('"code" é "invalid_data"', async () => {
+      const response = await SalesService.remove(ID_EXAMPLE);
+      expect(response.err.code).to.be.a('string', 'invalid_data');
+    });
+
+    it('"message" é "Wrong sale ID format"', async () => {
+      const response = await SalesService.remove(ID_EXAMPLE);
+      expect(response.err.message).to.be.a('string', 'Wrong sale ID format');
+    });
+  });
+
+  describe('em caso de sucesso', () => {
+    before(async () => {
+      sinon.stub(SalesModel, 'remove').resolves({ _id: ID_EXAMPLE, itensSold: payloadSales });
+    });
+  
+    after(() => {
+      SalesModel.remove.restore();
+    });
+
+    it('retorna um objeto', async () => {
+      const response = await SalesService.remove(ID_EXAMPLE);
+      expect(response).to.be.a('object');
+    });
+    
+    it('o objeto possui _id e itensSold', async () => {
+      const response = await SalesService.remove(ID_EXAMPLE);
+      expect(response).to.have.a.property('_id');
+      expect(response).to.have.a.property('itensSold');
+    });
+  });
+});
