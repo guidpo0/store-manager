@@ -55,7 +55,9 @@ Nesse projeto, fui capaz de:
 2. Instale as dependências do projeto
   * Instale as dependências:
     * `npm install`
-
+  * Inicie o projeto:
+    * `npm start
+ 
 3. Para realizar testes locais:
   * Comentar a linha 7 no /models/connection.js;
   * Descomentar a linha 8 no /models/connection.js;
