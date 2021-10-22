@@ -1,7 +1,7 @@
 const frisby = require('frisby');
 const { MongoClient } = require('mongodb');
 
-const mongoDbUrl = 'mongodb://mongodb:27017/StoreManager';
+const mongoDbUrl = 'mongodb://localhost:27017/StoreManager';
 const url = 'http://localhost:3000';
 const invalidId = 99999;
 
@@ -193,7 +193,7 @@ describe('2 - Crie um endpoint para listar os produtos', () => {
   });
 
   it('Será validado que não é possível listar um produto que não existe', async () => {
-    await frisby.get(`${url}/products/${invalidId}`)
+    await frisby.get(`${url}/products/${1234567891234567}`)
       .expect('status', 422)
       .then((secondResponse) => {
         const { json } = secondResponse;
