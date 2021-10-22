@@ -30,7 +30,7 @@ const update = async ({ _id, name, quantity }) => {
   if (ObjectId.isValid(_id)) {
     return mongoConnection.getConnection().then(
       (db) => db.collection('products').updateOne(
-        { _id: Object(_id) },
+        { _id: ObjectId(_id) },
         { $set: { name, quantity } },
       ),
     ).then(() => getById(_id));

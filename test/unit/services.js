@@ -451,14 +451,16 @@ describe('7 - Service - Atualiza uma venda no BD', () => {
 
   describe('em caso de sucesso', () => {
     before(async () => {
-      sinon.stub(SalesModel, 'getById').resolves({ _id: ID_EXAMPLE, payloadSales });
+      sinon.stub(SalesModel, 'getById').resolves({ _id: ID_EXAMPLE, itensSold: payloadSales });
       sinon.stub(ProductsModel, 'getById').resolves({ _id: ID_EXAMPLE, ...payloadProduct });
+      sinon.stub(ProductsModel, 'update').resolves();
       sinon.stub(SalesModel, 'update').resolves({ _id: ID_EXAMPLE, itensSold: payloadSales });
     });
     
     after(() => {
       SalesModel.getById.restore();
       ProductsModel.getById.restore();
+      ProductsModel.update.restore();
       SalesModel.update.restore();
     });
 
@@ -513,11 +515,15 @@ describe('8 - Service - Exclui uma venda no BD', () => {
     before(async () => {
       sinon.stub(SalesModel, 'remove').resolves({ _id: ID_EXAMPLE, itensSold: payloadSales });
       sinon.stub(SalesModel, 'getById').resolves({ _id: ID_EXAMPLE, itensSold: payloadSales });
+      sinon.stub(ProductsModel, 'update').resolves();
+      sinon.stub(ProductsModel, 'getById').resolves({ _id: ID_EXAMPLE, ...payloadProduct });
     });
   
     after(() => {
       SalesModel.remove.restore();
       SalesModel.getById.restore();
+      ProductsModel.update.restore();
+      ProductsModel.getById.restore();
     });
 
     it('retorna um objeto', async () => {

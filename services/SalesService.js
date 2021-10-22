@@ -1,28 +1,22 @@
 const SalesModel = require('../models/SalesModel');
+const ProductsModel = require('../models/ProductsModel');
 const {
   INVALID_DATA_ERROR,
   INVALID_SALE_ERROR,
   NOT_FOUND_ERROR,
 } = require('../helpers/errorsCodes');
 const {
-  validateRepeatedProducts,
   validateProductsIds,
   validateSaleId,
   validateQuantitiesToCreate,
   validateQuantitiesToUpdate,
-  validateQuantitiesToRemove,
 } = require('./validators/salesValidators');
 
 const create = async (products) => {
-  const { err: repeatedError } = await validateRepeatedProducts(products);
-  if (repeatedError) return { err: repeatedError };
-
   const { err: idError } = await validateProductsIds(products);
   if (idError) return { err: idError };
 
   const { err: quantityError } = await validateQuantitiesToCreate(products);
-  console.log(quantityError);
-
   if (quantityError) return { err: quantityError };
   return SalesModel.create(products);
 };
@@ -55,7 +49,13 @@ const remove = async (id) => {
   if (!sale) return INVALID_SALE_ERROR;
 
   const { itensSold } = sale;
-  await validateQuantitiesToRemove(itensSold);
+  const productsInfo = await Promise.all(
+    itensSold.map(({ productId }) => ProductsModel.getById(productId)),
+  );
+  await Promise.all(productsInfo.map(({ name, quantity }, index) => {
+    const { productId, quantity: saleQuantity } = itensSold[index];
+    return ProductsModel.update({ _id: productId, name, quantity: quantity + saleQuantity });
+  }));
   return sale;
 };
 

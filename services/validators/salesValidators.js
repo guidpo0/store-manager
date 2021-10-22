@@ -3,7 +3,12 @@ const ProductsModel = require('../../models/ProductsModel');
 const { INVALID_DATA_ERROR, INVALID_QUANTITY_ERROR } = require('../../helpers/errorsCodes');
 
 const getProductByIdToArray = (products) => Promise.all(
-  products.map(({ productId }) => ProductsModel.getById(productId)),
+  products.map(async ({ productId }) => {
+    const productInfo = await ProductsModel.getById(productId);
+    if (!productInfo) return null;
+    const { _id, name, quantity } = productInfo;
+    return { _id: _id.toString(), name, quantity };
+  }),
 );
 
 const hasListsSameProductsIds = (oldItensSold, newItensSold) => {
@@ -21,17 +26,6 @@ const mixArraysWithSameProductsIds = (firstArray, secondArray) => firstArray.map
     return { productId: idActual, quantity: quantityToUpdate - quantityActual }; 
   },
 );
-
-const validateRepeatedProducts = (itensSold) => {
-  const repeated = itensSold.some(({ productId: productIdOne }, indexOne) => itensSold.some(
-    ({ productId: productIdTwo }, indexTwo) => {
-      if ([indexOne, itensSold.length - 1].includes(indexTwo)) return false;
-      return productIdOne === productIdTwo;
-    },
-  ));
-  if (!repeated) return { valid: true };
-  return INVALID_DATA_ERROR;
-};
 
 const validateProductsIds = async (itensSold) => {
   const productsInfo = await getProductByIdToArray(itensSold);
@@ -53,8 +47,8 @@ const validateQuantitiesToCreate = async (itensSold) => {
   );
   if (areAllQuantitiesValid) {
     await Promise.all(productsInfo.map(({ name, quantity }, index) => {
-      const { _id, quantity: saleQuantity } = itensSold[index];
-      return ProductsModel.update({ _id, name, quantity: quantity - saleQuantity });
+      const { productId, quantity: saleQuantity } = itensSold[index];
+      return ProductsModel.update({ _id: productId, name, quantity: quantity - saleQuantity });
     }));
     return { valid: true };
   }
@@ -71,27 +65,17 @@ const validateQuantitiesToUpdate = async (id, itensSoldToUpdate) => {
   );
   if (areAllQuantitiesValid) {
     await Promise.all(productsInfo.map(({ name, quantity }, index) => {
-      const { _id, quantity: saleQuantity } = itensMixed[index];
-      return ProductsModel.update({ _id, name, quantity: quantity - saleQuantity });
+      const { productId, quantity: saleQuantity } = itensMixed[index];
+      return ProductsModel.update({ _id: productId, name, quantity: quantity - saleQuantity });
     }));
     return { valid: true };
   }
   return INVALID_QUANTITY_ERROR;
 };
 
-const validateQuantitiesToRemove = async (itensSold) => {
-  const productsInfo = await getProductByIdToArray(itensSold);
-  await Promise.all(productsInfo.map(({ name, quantity }, index) => {
-    const { _id, quantity: saleQuantity } = itensSold[index];
-    return ProductsModel.update({ _id, name, quantity: quantity + saleQuantity });
-  }));
-};
-
-module.esports = {
-  validateRepeatedProducts,
+module.exports = {
   validateProductsIds,
   validateSaleId,
   validateQuantitiesToCreate,
   validateQuantitiesToUpdate,
-  validateQuantitiesToRemove,
 };
