@@ -31,7 +31,7 @@ const update = async ({ _id, itensSold }) => {
   if (ObjectId.isValid(_id)) {
     return mongoConnection.getConnection().then(
       (db) => db.collection('sales').updateOne(
-        { _id: Object(_id) },
+        { _id: ObjectId(_id) },
         { $set: { itensSold } },
       ),
     ).then(() => getById(_id));
